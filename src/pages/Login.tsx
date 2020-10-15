@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Form, Input, Button, Checkbox, Card } from 'antd';
-import logoCircular from '../assets/logos/logo-circular.png'
-import { MailOutlined, KeyOutlined, LoginOutlined } from '@ant-design/icons'
-import './Login.css'
+import logoCircular from '../assets/logos/logo-circular.png';
+import { MailOutlined, KeyOutlined, LoginOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import './Login.css';
 
 const layout = {
     labelCol: { span: 8 },
@@ -45,9 +46,11 @@ class Login extends Component {
                 </Form.Item>
 
                 <Form.Item {...tailLayout}>
-                    <Button type="primary" block size="large" htmlType="submit" icon={<LoginOutlined />}>
-                    Ingresar
-                    </Button>
+                    <Link to="/administrator">
+                        <Button type="primary" block size="large" htmlType="submit" icon={<LoginOutlined />}>
+                        Ingresar
+                        </Button>
+                    </Link>
                 </Form.Item>
             </Form>
             </Card>
