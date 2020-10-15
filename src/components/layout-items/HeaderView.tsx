@@ -1,18 +1,23 @@
 import React, { Component } from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, PageHeader, Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import '../LayoutView.css';
 
 const { Header } = Layout;
 
 class HeaderView extends Component {
     render() {
-        return <Header>
-            <div className="logo" />
-            <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']}>
-                <Menu.Item key="1">nav 1</Menu.Item>
-                <Menu.Item key="2">nav 2</Menu.Item>
-                <Menu.Item key="3">nav 3</Menu.Item>
-            </Menu>
-        </Header>
+        return <Header className="site-layout-sub-header-background" style={{ padding: 0 }}>
+                <PageHeader
+                ghost={false}
+                onBack={() => window.history.back()}
+                title="Title"
+                extra={[
+                    <Avatar key="1" size="large" icon={<UserOutlined />} />,
+                ]}
+                >
+                </PageHeader>
+            </Header>
     }
 }
 

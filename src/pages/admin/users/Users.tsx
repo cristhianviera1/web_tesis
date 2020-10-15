@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import { Table } from 'antd';
 
 
@@ -36,6 +37,11 @@ class Users extends Component {
         searchText: '',
         searchedColumn: '',
     };
+
+    async componentDidMount() {
+      const res = await axios.get('http://192.168.1.2:4000/user');
+      console.log(res);
+    }
     
 
     render() {
