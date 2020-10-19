@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Image } from 'antd';
 import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import  HeaderView  from './layout-items/HeaderView';
 import  ContentView  from './layout-items/ContentView';
@@ -21,8 +21,8 @@ class LayoutView extends Component {
                     console.log(collapsed, type);
                 }}>
            
-            <div className="logo">
-                <img src="../assets/logos/logo-circular.png" alt=""/> 
+            <div style={{ height: "10%", margin: "16px" }}>
+                <Image width={"100%"} src={require("../assets/logos/logo-largo.png")}/>
             </div>
             <img src="../assets/logos/logo-circular.png" alt=""/> 
             <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>

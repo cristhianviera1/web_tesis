@@ -1,46 +1,27 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Table } from 'antd';
-
-
-const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-    },
-    {
-      key: '2',
-      name: 'Joe Black',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-    },
-    {
-      key: '3',
-      name: 'Jim Green',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-    },
-    {
-      key: '4',
-      name: 'Jim Red',
-      age: 32,
-      address: 'London No. 2 Lake Park',
-    },
-  ];
+import { Table, ConfigProvider, Empty } from 'antd';
   
+const customizeRenderEmpty = () => (
+  <div style={{ textAlign: 'center' }}>
+    <Empty description={ <span>No se encontraron datos</span>} />
+  </div>
+);
 
 class Users extends Component {
 
     state = {
+        users: [],
         searchText: '',
         searchedColumn: '',
     };
 
     async componentDidMount() {
-      const res = await axios.get('http://192.168.1.2:4000/user');
-      console.log(res);
+      await axios.get('http://192.168.1.2:4000/user').then( response => {
+        this.setState({users: response.data.data});
+      }).catch(error => {
+        console.log(error);
+      });
     }
     
 
@@ -60,13 +41,20 @@ class Users extends Component {
               width: '20%'
             },
             {
-              title: 'Address',
-              dataIndex: 'address',
-              key: 'address'
+              title: 'Gender',
+              dataIndex: 'gender',
+              key: 'gender'
+            },
+            {
+              title: 'Rol',
+              dataIndex: 'rol',
+              key: 'rol'
             },
           ];
 
-        return <Table columns={columns} dataSource={data} />
+        return <ConfigProvider renderEmpty={customizeRenderEmpty}>
+            <Table columns={columns} dataSource={this.state.users} rowKey="_id" />
+          </ConfigProvider>
     }
 }
 
