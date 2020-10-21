@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import  HeaderView  from './layout-items/HeaderView';
 import  FooterView  from './layout-items/FooterView';
 import Users from '../pages/admin/users/Users';
+import BranchOffice from '../pages/admin/branch-office/BranchOffice';
 import './LayoutView.css';
 
 const { Sider, Content } = Layout;
@@ -69,9 +70,9 @@ const routes = [
       main: () => <h2>Bubblegum</h2>
     },
     {
-      path: "/administrator/products",
-      name: "Productos",
+      path: "/administrator/branch-offices",
+      name: "Sucursales",
       icon: <AppstoreOutlined />,
-      main: () => <h2>Shoelaces</h2>
+      main: () => <BranchOffice/>
     }
 ];
