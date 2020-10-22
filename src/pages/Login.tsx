@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Form, Input, Button, Checkbox, Card } from 'antd';
 import logoCircular from '../assets/logos/logo-circular.png';
 import { MailOutlined, KeyOutlined, LoginOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { history } from '../redux/_helpers/history';
+import { userActions } from '../redux/_actions/user-actions';
 import './Login.css';
 
 const layout = {
@@ -16,8 +17,25 @@ const tailLayout = {
 
 class Login extends Component {
 
+    constructor(props:any){
+        super(props);
+
+        this.state = {
+            email: '',
+            password: ''
+        }
+    }
+
+    componentWillMount() {
+        if(localStorage.getItem('auth')){
+            history.push('/administrator');
+            window.location.reload();
+        }
+    }
+
     onFinish = (values: any) => {
         console.log('Success:', values);
+        userActions.login(values['email'],values['password']);
     };
 
     onFinishFailed = (errorInfo: any) => {
@@ -34,11 +52,11 @@ class Login extends Component {
 
             <Form {...layout} name="basic" className="Form-login" initialValues={{ remember: true }} onFinish={this.onFinish} onFinishFailed={this.onFinishFailed}>
                 <Form.Item name="email" rules={[{ required: true, message: 'Por favor ingresa tu correo!' }]}>
-                    <Input size="large" placeholder="Correo" prefix={<MailOutlined />} />
+                    <Input size="large" placeholder="Correo" prefix={<MailOutlined />}/>
                 </Form.Item>
 
                 <Form.Item name="password" rules={[{ required: true, message: 'Por favor ingresa tu contraseña!' }]}>
-                    <Input.Password size="large" placeholder="Contraseña" prefix={<KeyOutlined />} />
+                    <Input.Password size="large" placeholder="Contraseña" prefix={<KeyOutlined />}/>
                 </Form.Item>
 
                 <Form.Item {...tailLayout} name="remember" valuePropName="checked">
@@ -46,11 +64,9 @@ class Login extends Component {
                 </Form.Item>
 
                 <Form.Item {...tailLayout}>
-                    <Link to="/administrator">
                         <Button type="primary" block size="large" htmlType="submit" icon={<LoginOutlined />}>
                         Ingresar
                         </Button>
-                    </Link>
                 </Form.Item>
             </Form>
             </Card>
