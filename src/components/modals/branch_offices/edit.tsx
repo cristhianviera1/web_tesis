@@ -40,6 +40,7 @@ const EditBranchModal: FunctionComponent<EditBranchModalValues> = ({visible, ini
         office.address.city=data.city
         office.address.latitude=data.latitude
         office.address.longitude=data.longitude
+        console.log(office);
         setLoading(true);
         axiosConfig().put('branch-offices', office)
             .then(() => message.success("Se ha editado exitósamente la sucursal"))
@@ -49,7 +50,10 @@ const EditBranchModal: FunctionComponent<EditBranchModalValues> = ({visible, ini
                 }
                 return message.error("No se ha podido actualizar la sucursal, vuelva a intentarlo más tarde")
             })
-            .finally(() => setLoading(false))
+            .finally(() => {
+                setLoading(false)
+                onClose();
+            })
     }
 
     return (

@@ -48,12 +48,23 @@ const BranchOfficeForm: FunctionComponent<BranchOfficeForm> = ({initialValues, l
             ...initialValues
         }
     })
+
     useEffect(() => {
         reset(initialValues)
     }, [initialValues])
 
     return (
         <Form layout={'vertical'} onFinish={handleSubmit(onSubmit)}>
+            <Form.Item label={"ID"} hidden={true}>
+                <Controller
+                    name={'id'}
+                    as={Input}
+                    control={control}
+                />
+                {
+                    errors.id && <Text type={'danger'}>{errors.id.message}</Text>
+                }
+            </Form.Item>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 <Col span={12}>
                     <Form.Item label={"Nombre"}>

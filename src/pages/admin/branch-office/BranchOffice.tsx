@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Button, Col, ConfigProvider, Empty, message, Row, Space, Table, Typography} from 'antd';
+import {Button, Col, ConfigProvider, Empty, Input, message, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
-import {DeleteOutlined, EditOutlined, PlusOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
+import Highlighter from 'react-highlight-words';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
 import EditBranchModal from "../../../components/modals/branch_offices/edit";
 import NewBranchModal from "../../../components/modals/branch_offices/new";
@@ -31,7 +32,8 @@ class BranchOffice extends Component {
         searchedColumn: '',
         loading: false,
         visibleEditModal: false,
-        visibleNewModal: false
+        visibleNewModal: false,
+        idOffice:0,
     };
 
     getBranchOffices() {
@@ -44,8 +46,13 @@ class BranchOffice extends Component {
                         "id": order?._id,
                         "name": order?.name,
                         "email": order?.email,
-                        "address": order?.address?.first_address,
+                        "first_address": order?.address?.first_address,
+                        "second_address": order?.address?.second_address,
+                        "country": order?.address?.country,
+                        "state": order?.address?.state,
                         "city": order?.address?.city,
+                        "latitude": order?.address?.latitude,
+                        "longitude": order?.address?.longitude,
                     }))
                 });
             })
@@ -57,13 +64,87 @@ class BranchOffice extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
-    deleteBranchOffice() {
-
+    deleteBranchOffice(id) {
+        axiosConfig().delete(`Search ${id}`).then(() => message.success("Se ha editado exitósamente la sucursal"))
+            .catch((error) => {
+            if (error?.response?.data?.message) {
+                return message.error(error?.response?.data?.message);
+            }
+            return message.error("No se pudo eliminar la sucursal, por favor intentelo mas tarde")
+        }).finally(()=> this.getBranchOffices())
     }
 
     componentDidMount() {
-        this.getBranchOffices()
+        this.getBranchOffices();
     }
+
+    // Filtro de busqueda
+    getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            <div style={{ padding: 8 }}>
+                <Input
+                    ref={node => {
+                        // @ts-ignore
+                        this.searchInput = node;
+                    }}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Buscar
+                    </Button>
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                        Restaurar
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        onFilter: (value, record) =>
+            record[dataIndex]
+                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+                : '',
+        onFilterDropdownVisibleChange: visible => {
+            if (visible) {
+                // @ts-ignore
+                setTimeout(() => this.searchInput.select(), 100);
+            }
+        },
+        render: text =>
+            this.state.searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[this.state.searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
+
+    handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        this.setState({
+            searchText: selectedKeys[0],
+            searchedColumn: dataIndex,
+        });
+    };
+
+    handleReset = clearFilters => {
+        clearFilters();
+        this.setState({ searchText: '' });
+    };
 
     render() {
         const columns: ColumnsType<BranchOfficeTable> = [
@@ -73,36 +154,44 @@ class BranchOffice extends Component {
                 key: 'key',
             },
             {
-                title: 'Name',
+                title: 'Nombre',
                 dataIndex: 'name',
                 key: 'name',
                 width: '30%',
+                ...this.getColumnSearchProps('name')
             },
             {
                 title: 'Email',
                 dataIndex: 'email',
                 key: 'email',
                 width: '20%',
+                ...this.getColumnSearchProps('email')
             },
             {
-                title: 'Address',
-                dataIndex: 'address',
+                title: 'Dirección',
+                dataIndex: 'first_address',
                 key: 'address',
+                ...this.getColumnSearchProps('first_address')
             },
             {
-                title: 'City',
+                title: 'Ciudad',
                 dataIndex: 'city',
                 key: 'city',
+                ...this.getColumnSearchProps('city')
             },
             {
-                title: 'Actions',
+                title: 'Acciones',
+                dataIndex: 'key',
                 key: 'actions',
-                render: () => (
+                render: (key) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-                            this.setState({visibleEditModal: true});
+                            this.setState({visibleEditModal: true, idOffice:key-1});
                         }}/>
-                        <Button shape="circle" danger icon={<DeleteOutlined/>}/>
+                        <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
+                            this.setState({idOffice:key-1});
+                            this.deleteBranchOffice(this.state.idOffice)
+                        }}/>
                     </Space>)
             },
         ];
@@ -154,18 +243,7 @@ class BranchOffice extends Component {
                     this.state.visibleEditModal &&
                     <EditBranchModal
                         visible={this.state.visibleEditModal}
-                        initialValues={{
-                            id: "",
-                            name: "Sucursal N",
-                            email: "asd@asd.com",
-                            first_address: "Chicago y N12",
-                            second_address: "San Jose de Moran",
-                            country: "Ecuador",
-                            state: "Pichincha",
-                            city: "Quito",
-                            latitude: "-1.211454",
-                            longitude: "-1.521656",
-                        }}
+                        initialValues={this.state.branchOffices[this.state.idOffice]}
                         onClose={() => {
                             this.getBranchOffices();
                             this.setState({visibleEditModal: false})
