@@ -1,9 +1,9 @@
 import React, {FunctionComponent, useEffect} from "react";
-import {Button, Form, Input, Upload, Space, Typography} from "antd";
-import { UploadOutlined, InboxOutlined } from '@ant-design/icons';
+import {Button, Form, Input, Space, Typography} from "antd";
 import * as yup from 'yup';
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
+import FileBase64 from 'react-file-base64';
 
 const {Text} = Typography
 const { TextArea } = Input;
@@ -28,8 +28,8 @@ interface NewnessForm {
 const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, onSubmit, onCancel}) => {
     const validationSchema = yup.object().shape({
         title: yup.string().max(50).min(5).required(),
-        description: yup.string().email().required(),
-        image: yup.string().max(50).min(5).required(),
+        description: yup.string().max(500).min(50).required(),
+        image: yup.string().required(),
     })
 
     const {control, errors, handleSubmit, reset} = useForm<NewnessValues>({
@@ -39,13 +39,10 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
         }
     })
 
-    const normFile = e => {
-        console.log('Upload event:', e);
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e && e.fileList;
-    };
+    const getFiles = files =>{
+        let base = (document.getElementById('image') as HTMLInputElement);
+        base.value = files.base64
+    }
 
     useEffect(() => {
         reset(initialValues)
@@ -53,7 +50,16 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
 
     return (
         <Form layout={'vertical'} onFinish={handleSubmit(onSubmit)}>
-
+            <Form.Item label={"ID"} hidden={true}>
+                <Controller
+                    name={'id'}
+                    as={Input}
+                    control={control}
+                />
+                {
+                    errors.id && <Text type={'danger'}>{errors.id.message}</Text>
+                }
+            </Form.Item>
             <Form.Item label={"Título"}>
                 <Controller
                     name={'title'}
@@ -64,7 +70,7 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
                     errors.title && <Text type={'danger'}>{errors.title.message}</Text>
                 }
             </Form.Item>
-            <Form.Item label={"Dirección 1"}>
+            <Form.Item label={"Descripción"}>
                 <Controller
                     name={'description'}
                     as={TextArea}
@@ -74,17 +80,27 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
                     errors.description && <Text type={'danger'}>{errors.description.message}</Text>
                 }
             </Form.Item>
-            <Form.Item label="Dragger">
-                <Form.Item name="dragger" valuePropName="fileList" getValueFromEvent={normFile} noStyle>
-                    <Upload.Dragger name="files" action="/upload.do" multiple={false}>
-                        <p className="ant-upload-drag-icon">
-                            <InboxOutlined />
-                        </p>
-                        <p className="ant-upload-text">Da click o arrastra una foto a esta area para subirla</p>
-                        <p className="ant-upload-hint">Support for a single or bulk upload.</p>
-                    </Upload.Dragger>
-                </Form.Item>
+            <Form.Item label={"Imagen"}>
+                <FileBase64
+                    multiple={false}
+                    accept={'image/*'}
+                    onDone={getFiles.bind(this)}
+                />
+                {
+                    errors.image && <Text type={'danger'}>{errors.image.message}</Text>
+                }
             </Form.Item>
+
+            <Form.Item label={"Imagen"}>
+                <Controller
+                    id={'image'}
+                    itemID={'image'}
+                    name={'image'}
+                    as={Input}
+                    control={control}
+                />
+            </Form.Item>
+
 
             <Form.Item style={{textAlign: 'end'}}>
                 <Space>

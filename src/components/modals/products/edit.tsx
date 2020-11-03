@@ -1,29 +1,29 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
-import {NewnessTable} from "../../../pages/admin/newness/Newness";
-import NewnessForm , {NewnessValues} from "../../forms/newness/newness-form";
+import {ProductsTable} from "../../../pages/admin/products/Products";
+import ProductsForm , {ProductsValues} from "../../forms/products/products-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
-interface EditNewnessModalValues {
+interface EditProductModalValues {
     visible: boolean,
-    initialValues: NewnessValues,
+    initialValues: ProductsValues,
 
     onClose(): void
 }
 
-const EditNewnessModal: FunctionComponent<EditNewnessModalValues> = ({visible, initialValues, onClose}) => {
+const EditProductModal: FunctionComponent<EditProductModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [newness, setNewness] = useState<NewnessTable>()
+    const [products, setProduct] = useState<ProductsTable>()
 
-    const saveNewness = (data: NewnessValues) => {
+    const saveProduct = (data: ProductsValues) => {
         setLoading(true);
         axiosConfig().put('products', data)
-            .then(() => message.success("Se ha editado exitósamente la novedad"))
+            .then(() => message.success("Se ha editado exitósamente el producto"))
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
                 }
-                return message.error("No se ha podido actualizar la novedad, vuelva a intentarlo más tarde")
+                return message.error("No se ha podido actualizar el producto, vuelva a intentarlo más tarde")
             })
             .finally(() => setLoading(false))
     }
@@ -35,13 +35,13 @@ const EditNewnessModal: FunctionComponent<EditNewnessModalValues> = ({visible, i
             closable={false}
             footer={null}
         >
-            <NewnessForm
+            <ProductsForm
                 loading={loading}
-                onSubmit={saveNewness}
+                onSubmit={saveProduct}
                 initialValues={initialValues}
                 onCancel={onClose}
             />
         </Modal>
     );
 }
-export default EditNewnessModal;
+export default EditProductModal;

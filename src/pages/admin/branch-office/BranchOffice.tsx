@@ -65,7 +65,7 @@ class BranchOffice extends Component {
     }
 
     deleteBranchOffice(id) {
-        axiosConfig().delete(`Search ${id}`).then(() => message.success("Se ha editado exitósamente la sucursal"))
+        axiosConfig().delete(`branch-offices/${id}`).then(() => message.success("Se ha eliminado exitósamente la sucursal"))
             .catch((error) => {
             if (error?.response?.data?.message) {
                 return message.error(error?.response?.data?.message);

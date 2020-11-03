@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Image, Layout, Menu} from 'antd';
-import {AppstoreOutlined, IdcardOutlined, NotificationOutlined} from '@ant-design/icons';
+import {AppstoreOutlined, IdcardOutlined, NotificationOutlined, ShopOutlined} from '@ant-design/icons';
 import {BrowserRouter as Router, Link, Switch} from "react-router-dom";
 import {PrivateRoute} from '../redux/_components/PrivateRoute';
 import {setLocale} from 'yup';
@@ -12,6 +12,7 @@ import Users from '../pages/admin/users/Users';
 import BranchOffice from '../pages/admin/branch-office/BranchOffice';
 import Newness from '../pages/admin/newness/Newness';
 import './LayoutView.css';
+import Products from "../pages/admin/products/Products";
 
 const {Sider, Content} = Layout;
 
@@ -78,8 +79,14 @@ const routes = [
     {
         path: "/administrator/branch-offices",
         name: "Sucursales",
-        icon: <AppstoreOutlined/>,
+        icon: <ShopOutlined />,
         main: () => <BranchOffice/>
+    },
+    {
+        path: "/administrator/products",
+        name: "Productos",
+        icon: <AppstoreOutlined/>,
+        main: () => <Products/>
     }
 ];
 

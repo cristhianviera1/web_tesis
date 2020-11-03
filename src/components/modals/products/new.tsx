@@ -1,38 +1,38 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
-import {NewnessTable} from "../../../pages/admin/newness/Newness";
-import NewnessForm , {NewnessValues} from "../../forms/newness/newness-form";
+import {ProductsTable} from "../../../pages/admin/products/Products";
+import ProductsForm , {ProductsValues} from "../../forms/products/products-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
-interface NewNewnessModalValues {
+interface NewProductsModalValues {
     visible: boolean,
-    initialValues: NewnessValues,
+    initialValues: ProductsValues,
 
     onClose(): void
 }
 
-const NewNewnessModal: FunctionComponent<NewNewnessModalValues> = ({visible, initialValues, onClose}) => {
+const NewProductsModal: FunctionComponent<NewProductsModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [newness, setNewness] = useState<NewnessTable>()
-    const news = {
+    const [products, setProducts] = useState<ProductsTable>()
+    const product = {
         title: "",
-        description: "",
+        detail: "",
+        price: "",
+        category: "",
+        stock: "",
+        status: "",
         image: ""
     }
 
-    const saveNewness = (data) => {
-        news.title = data.title;
-        news.description=data.description;
-        news.image=data.image;
-        console.log("lo que envie: "+news);
+    const saveProduct = (data) => {
         setLoading(true);
         axiosConfig().post('branch-offices', data)
-            .then(() => message.success("Se ha creado exitósamente la novedad"))
+            .then(() => message.success("Se ha creado exitósamente el producto"))
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
                 }
-                return message.error("No se ha podido crear la novedad, vuelva a intentarlo más tarde")
+                return message.error("No se ha podido crear el producto, vuelva a intentarlo más tarde")
             })
             .finally(() => {
                 setLoading(false)
@@ -46,13 +46,13 @@ const NewNewnessModal: FunctionComponent<NewNewnessModalValues> = ({visible, ini
             maskClosable={false}
             footer={[]}
         >
-            <NewnessForm
+            <ProductsForm
                 loading={loading}
                 initialValues={initialValues}
-                onSubmit={saveNewness}
+                onSubmit={saveProduct}
                 onCancel={onClose}
             />
         </Modal>
     );
 }
-export default NewNewnessModal;
+export default NewProductsModal;
