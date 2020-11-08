@@ -16,7 +16,7 @@ const customizeRenderEmpty = () => (
 );
 
 export interface NewnessTable {
-    id: string;
+    _id: string;
     key: number;
     title: string;
     description: string;
@@ -42,7 +42,7 @@ class Newness extends Component {
                 this.setState({
                     newness: data?.map((order, index) => ({
                         "key": index + 1,
-                        "id": order?._id,
+                        "_id": order?._id,
                         "title": order?.title,
                         "description": order?.description,
                         "image": order?.image,
@@ -57,8 +57,8 @@ class Newness extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
-    deleteNewness(id) {
-        axiosConfig().delete(`newness/${id}`).then(() => message.success("Se ha eliminado exitósamente la novedad"))
+    deleteNewness(newness) {
+        axiosConfig().delete(`newness/${newness._id}`).then(() => message.success("Se ha eliminado exitósamente la novedad"))
             .catch((error) => {
                 if (error?.response?.data?.message) {
                     return message.error(error?.response?.data?.message);
@@ -183,7 +183,7 @@ class Newness extends Component {
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
                             this.setState({idNews:key-1});
-                            this.deleteNewness(this.state.idNews)
+                            this.deleteNewness(this.state.newness[this.state.idNews])
                         }}/>
                     </Space>)
             },

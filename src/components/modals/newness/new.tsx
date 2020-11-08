@@ -14,29 +14,23 @@ interface NewNewnessModalValues {
 const NewNewnessModal: FunctionComponent<NewNewnessModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [newness, setNewness] = useState<NewnessTable>()
-    const news = {
-        title: "",
-        description: "",
-        image: ""
-    }
 
-    const saveNewness = (data) => {
-        news.title = data.title;
-        news.description=data.description;
-        news.image=data.image;
-        console.log("lo que envie: "+news);
+    const saveNewness = (data: NewnessValues) => {
         setLoading(true);
-        axiosConfig().post('branch-offices', data)
-            .then(() => message.success("Se ha creado exitósamente la novedad"))
+        axiosConfig().post('newness', data)
+            .then(() => {
+                message.success("Se ha creado exitósamente la novedad")
+                onClose();
+            })
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
                 }
+                console.log(error)
                 return message.error("No se ha podido crear la novedad, vuelva a intentarlo más tarde")
             })
             .finally(() => {
                 setLoading(false)
-                onClose();
             })
     }
 

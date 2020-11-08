@@ -14,19 +14,10 @@ interface NewProductsModalValues {
 const NewProductsModal: FunctionComponent<NewProductsModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [products, setProducts] = useState<ProductsTable>()
-    const product = {
-        title: "",
-        detail: "",
-        price: "",
-        category: "",
-        stock: "",
-        status: "",
-        image: ""
-    }
 
-    const saveProduct = (data) => {
+    const saveProduct = (data: ProductsValues) => {
         setLoading(true);
-        axiosConfig().post('branch-offices', data)
+        axiosConfig().post('products', data)
             .then(() => message.success("Se ha creado exitósamente el producto"))
             .catch((error) => {
                 if (error?.response?.data?.messsage) {

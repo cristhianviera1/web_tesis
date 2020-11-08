@@ -64,8 +64,8 @@ class BranchOffice extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
-    deleteBranchOffice(id) {
-        axiosConfig().delete(`branch-offices/${id}`).then(() => message.success("Se ha eliminado exitósamente la sucursal"))
+    deleteBranchOffice(branchOffice) {
+        axiosConfig().delete(`branch-offices/${branchOffice.id}`).then(() => message.success("Se ha eliminado exitósamente la sucursal"))
             .catch((error) => {
             if (error?.response?.data?.message) {
                 return message.error(error?.response?.data?.message);
@@ -190,7 +190,7 @@ class BranchOffice extends Component {
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
                             this.setState({idOffice:key-1});
-                            this.deleteBranchOffice(this.state.idOffice)
+                            this.deleteBranchOffice(this.state.branchOffices[this.state.idOffice])
                         }}/>
                     </Space>)
             },

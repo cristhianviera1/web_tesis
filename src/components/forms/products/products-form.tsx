@@ -47,7 +47,7 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
         detail: yup.string().max(500).min(50).required(),
         price: yup.number().min(0).positive().required(),
         category: yup.string().max(500).min(50).required(),
-        stock: yup.string().min(0).positive().required(),
+        stock: yup.string().min(0).required(),
         status: yup.boolean().required(),
         image: yup.string().required(),
     })

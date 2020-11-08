@@ -16,9 +16,13 @@ const EditNewnessModal: FunctionComponent<EditNewnessModalValues> = ({visible, i
     const [newness, setNewness] = useState<NewnessTable>()
 
     const saveNewness = (data: NewnessValues) => {
+        console.log(data._id);
         setLoading(true);
-        axiosConfig().put('products', data)
-            .then(() => message.success("Se ha editado exitósamente la novedad"))
+        axiosConfig().put('newness', data)
+            .then(() => {
+                message.success("Se ha editado exitósamente la novedad")
+                onClose();
+            })
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)

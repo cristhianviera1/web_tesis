@@ -1,15 +1,15 @@
-import React, {FunctionComponent, useEffect} from "react";
-import {Button, Form, Input, Space, Typography} from "antd";
+import React, {FunctionComponent, useEffect, useState} from "react";
+import {Button, Form, Input, message, Space, Typography, Upload} from "antd";
 import * as yup from 'yup';
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
-import FileBase64 from 'react-file-base64';
+import {PlusCircleOutlined} from "@ant-design/icons";
 
 const {Text} = Typography
-const { TextArea } = Input;
+const {TextArea} = Input;
 
 export interface NewnessValues {
-    id?: string;
+    _id?: string;
     title: string;
     description: string;
     image: string;
@@ -31,34 +31,70 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
         description: yup.string().max(500).min(50).required(),
         image: yup.string().required(),
     })
+    const [loadingImage, setLoadingImage] = useState<boolean>(false)
 
-    const {control, errors, handleSubmit, reset} = useForm<NewnessValues>({
+    const {control, errors, handleSubmit, reset, setValue, watch, register} = useForm<NewnessValues>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             ...initialValues
         }
     })
-
-    const getFiles = files =>{
-        let base = (document.getElementById('image') as HTMLInputElement);
-        base.value = files.base64
-    }
-
     useEffect(() => {
         reset(initialValues)
+        register('image')
     }, [initialValues])
+
+    const imageValue = watch('image');
+
+    function beforeUpload(file) {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
+        if (!isJpgOrPng) {
+            message.error("El formato no es permitido. Los formatos permitidos son: jpeg, jpg, png");
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            message.error("El peso es superior a 2MB");
+        }
+        return isJpgOrPng && isLt2M;
+    }
+
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    const onChange = async (info) => {
+        const nextState: any = {};
+        switch (info.file.status) {
+            case "uploading":
+                setLoadingImage(true)
+                nextState.image = info.file;
+                nextState.image.url = await getBase64(info.file.originFileObj);
+                break;
+
+            case "done":
+                nextState.image = info.file;
+                setLoadingImage(false);
+                break;
+
+            default:
+                setLoadingImage(false);
+        }
+        setValue('image', nextState?.image?.url);
+    };
 
     return (
         <Form layout={'vertical'} onFinish={handleSubmit(onSubmit)}>
             <Form.Item label={"ID"} hidden={true}>
                 <Controller
-                    name={'id'}
+                    name={'_id'}
                     as={Input}
                     control={control}
                 />
-                {
-                    errors.id && <Text type={'danger'}>{errors.id.message}</Text>
-                }
             </Form.Item>
             <Form.Item label={"Título"}>
                 <Controller
@@ -80,25 +116,30 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
                     errors.description && <Text type={'danger'}>{errors.description.message}</Text>
                 }
             </Form.Item>
-            <Form.Item label={"Imagen"}>
-                <FileBase64
-                    multiple={false}
-                    accept={'image/*'}
-                    onDone={getFiles.bind(this)}
-                />
-                {
-                    errors.image && <Text type={'danger'}>{errors.image.message}</Text>
-                }
-            </Form.Item>
-
-            <Form.Item label={"Imagen"}>
-                <Controller
-                    id={'image'}
-                    itemID={'image'}
-                    name={'image'}
-                    as={Input}
-                    control={control}
-                />
+            <Form.Item label={"Imagen"} style={{width:'100%', display:'flex',justifyContent:'center',textAlign:'center'}}>
+                <Upload
+                    name="image"
+                    listType="picture-card"
+                    className="avatar-uploader"
+                    showUploadList={false}
+                    customRequest={() => {
+                    }}
+                    beforeUpload={beforeUpload}
+                    onChange={info => {
+                        onChange(info)
+                    }}
+                >
+                    {
+                        imageValue ?
+                            <img src={imageValue} alt="avatar"
+                                 style={{width: '100%'}}/>
+                            :
+                            <div>
+                                <PlusCircleOutlined />
+                                <div className="ant-upload-text">Subir Imagen</div>
+                            </div>
+                    }
+                </Upload>
             </Form.Item>
 
 

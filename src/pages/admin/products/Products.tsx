@@ -1,8 +1,12 @@
 import React, {Component} from 'react';
-import axios from 'axios';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import {Button, ConfigProvider, Empty, message, Space, Table} from 'antd';
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {Button, Col, ConfigProvider, Empty, Input, message, Row, Space, Table, Typography} from 'antd';
+import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
+import NewProductsModal from "../../../components/modals/products/new";
+import EditProductModal from "../../../components/modals/products/edit";
+
+const {Title} = Typography;
 
 const customizeRenderEmpty = () => (
     <div style={{textAlign: 'center'}}>
@@ -28,6 +32,8 @@ class Products extends Component {
         products: [],
         searchText: '',
         searchedColumn: '',
+        visibleEditModal: false,
+        visibleNewModal: false,
         loading: false,
         idProduct:0,
     };
@@ -58,8 +64,8 @@ class Products extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
-    deleteProduct(id) {
-        axiosConfig().delete(`product/${id}`).then(() => message.success("Se ha eliminado exitósamente el producto"))
+    deleteProduct(product) {
+        axiosConfig().delete(`product/${product.id}`).then(() => message.success("Se ha eliminado exitósamente el producto"))
             .catch((error) => {
                 if (error?.response?.data?.message) {
                     return message.error(error?.response?.data?.message);
@@ -71,6 +77,74 @@ class Products extends Component {
     async componentDidMount() {
        this.getProducts();
     }
+
+    // Filtro de busqueda
+    getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+            <div style={{ padding: 8 }}>
+                <Input
+                    ref={node => {
+                        // @ts-ignore
+                        this.searchInput = node;
+                    }}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                        icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Buscar
+                    </Button>
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                        Restaurar
+                    </Button>
+                </Space>
+            </div>
+        ),
+        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        onFilter: (value, record) =>
+            record[dataIndex]
+                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+                : '',
+        onFilterDropdownVisibleChange: visible => {
+            if (visible) {
+                // @ts-ignore
+                setTimeout(() => this.searchInput.select(), 100);
+            }
+        },
+        render: text =>
+            this.state.searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[this.state.searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                text
+            ),
+    });
+
+    handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        this.setState({
+            searchText: selectedKeys[0],
+            searchedColumn: dataIndex,
+        });
+    };
+
+    handleReset = clearFilters => {
+        clearFilters();
+        this.setState({ searchText: '' });
+    };
 
 
     render() {
@@ -84,22 +158,26 @@ class Products extends Component {
             {
                 title: 'Título',
                 dataIndex: 'title',
-                key: 'title'
+                key: 'title',
+                ...this.getColumnSearchProps('title')
             },
             {
                 title: 'Stock',
                 dataIndex: 'stock',
-                key: 'stock'
+                key: 'stock',
+                ...this.getColumnSearchProps('stock')
             },
             {
                 title: 'Precio',
                 dataIndex: 'price',
-                key: 'price'
+                key: 'price',
+                ...this.getColumnSearchProps('price')
             },
             {
                 title: 'Status',
                 dataIndex: 'status',
-                key: 'status'
+                key: 'status',
+                ...this.getColumnSearchProps('status')
             },
             {
                 title: 'Acciones',
@@ -112,19 +190,66 @@ class Products extends Component {
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
                             this.setState({idNews:key-1});
-                            this.deleteProduct(this.state.idProduct)
+                            this.deleteProduct(this.state.products[this.state.idProduct])
                         }}/>
                     </Space>)
             },
         ];
 
-        return <ConfigProvider renderEmpty={customizeRenderEmpty}>
-            <Table
-                columns={columns}
-                dataSource={this.state.products}
-                scroll={{x: 'max-content'}}
-                loading={this.state.loading}/>
-        </ConfigProvider>
+        return <div>
+            <div>
+                <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
+                    <Col className="gutter-row" span={20}>
+                        <Title level={2}>Productos</Title>
+                    </Col>
+                    <Col className="gutter-row" span={4}>
+                        <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
+                            this.setState({visibleNewModal: true})
+                        }}>
+                            Nuevo
+                        </Button>
+                        {
+                            this.state.visibleNewModal &&
+                            <NewProductsModal
+                                visible={this.state.visibleNewModal}
+                                initialValues={{
+                                    title: "",
+                                    detail: "",
+                                    price: 0,
+                                    category: "",
+                                    stock: 0,
+                                    status: true,
+                                    image: "",
+                                }}
+                                onClose={() => {
+                                    this.getProducts();
+                                    this.setState({visibleNewModal: false})
+                                }}
+                            />
+                        }
+                    </Col>
+                </Row>
+            </div>
+
+            <ConfigProvider renderEmpty={customizeRenderEmpty}>
+                <Table
+                    columns={columns}
+                    dataSource={this.state.products}
+                    scroll={{x: 'max-content'}}
+                    loading={this.state.loading}/>
+                {
+                    this.state.visibleEditModal &&
+                    <EditProductModal
+                        visible={this.state.visibleEditModal}
+                        initialValues={this.state.products[this.state.idProduct]}
+                        onClose={() => {
+                            this.getProducts();
+                            this.setState({visibleEditModal: false})
+                        }}
+                    />
+                }
+            </ConfigProvider>
+        </div>
     }
 }
 
