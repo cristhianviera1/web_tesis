@@ -17,12 +17,12 @@ const customizeRenderEmpty = () => (
 export interface ProductsTable {
     id: string;
     key: number;
-    title: string;
+    name: string;
     detail: string;
     price: string;
-    category: string;
+    category: [];
     stock: number;
-    status?: boolean;
+    status: boolean;
     image: string;
 }
 
@@ -46,7 +46,7 @@ class Products extends Component {
                     products: data?.map((order, index) => ({
                         "key": index + 1,
                         "id": order?._id,
-                        "title": order?.title,
+                        "name": order?.name,
                         "detail": order?.detail,
                         "price": order?.price,
                         "category": order?.category,
@@ -156,10 +156,10 @@ class Products extends Component {
                 key: 'key',
             },
             {
-                title: 'Título',
-                dataIndex: 'title',
-                key: 'title',
-                ...this.getColumnSearchProps('title')
+                title: 'Nombre',
+                dataIndex: 'name',
+                key: 'name',
+                ...this.getColumnSearchProps('name')
             },
             {
                 title: 'Stock',
@@ -213,10 +213,10 @@ class Products extends Component {
                             <NewProductsModal
                                 visible={this.state.visibleNewModal}
                                 initialValues={{
-                                    title: "",
+                                    name: "",
                                     detail: "",
                                     price: 0,
-                                    category: "",
+                                    category: [],
                                     stock: 0,
                                     status: true,
                                     image: "",

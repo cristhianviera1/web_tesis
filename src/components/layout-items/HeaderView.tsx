@@ -1,22 +1,25 @@
 import React, {Component} from 'react';
 import {Avatar, Dropdown, Layout, Menu, PageHeader} from 'antd';
 import {LogoutOutlined, UserOutlined} from '@ant-design/icons';
-import {userActions} from '../../redux/_actions/user-actions';
 import '../LayoutView.css';
+import {history} from "../_helpers/history";
 
 const {Header} = Layout;
 
 class HeaderView extends Component {
 
-    logout = () => {
-        userActions.logout();
+    logOut() {
+        localStorage.removeItem('auth');
+        localStorage.removeItem('token');
+        history.push('/');
+        window.location.reload();
     }
 
     menu = (
         <Menu>
             <Menu.Item danger onClick={(event) => {
-                this.logout()
-            }}><p>Cerrar sessión <LogoutOutlined/></p></Menu.Item>
+                this.logOut()
+            }}><p>Cerrar sesión <LogoutOutlined/></p></Menu.Item>
         </Menu>
     );
 

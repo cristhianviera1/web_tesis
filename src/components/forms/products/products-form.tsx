@@ -1,23 +1,29 @@
-import React, {FunctionComponent, useEffect} from "react";
-import {Button, Form, Input, Space, Typography, Row, Col, Switch, Select, Tag} from "antd";
+import React, {FunctionComponent, useEffect, useState} from "react";
+import {Button, Form, Input, Space, Typography, Row, Col, Switch, Select, Upload, message} from "antd";
 import * as yup from 'yup';
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
-import FileBase64 from 'react-file-base64';
-import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
+import {CheckOutlined, CloseOutlined, PlusCircleOutlined} from "@ant-design/icons";
 
 const {Text} = Typography
 const { TextArea } = Input;
+const { Option } = Select;
+
 
 export interface ProductsValues {
     id?: string;
-    title: string;
+    name: string;
     detail: string;
     price: number;
-    category: string;
+    category: [];
     stock: number;
     status?: boolean;
     image: string;
+}
+
+export interface  Category {
+    _id_: string;
+    name: string;
 }
 
 interface ProductsForm {
@@ -29,44 +35,79 @@ interface ProductsForm {
     onCancel(): void
 }
 
-const options = [{ value: 'gold' }, { value: 'lime' }, { value: 'green' }, { value: 'cyan' }];
-
-function tagRender(props) {
-    const { label, value, closable, onClose } = props;
-
-    return (
-        <Tag color={value} closable={closable} onClose={onClose} style={{ marginRight: 3 }}>
-            {label}
-        </Tag>
-    );
+const children = [];
+for (let i = 10; i < 36; i++) {
+    // @ts-ignore
+    children.push(<Option key={i}>{i.toString(36) + i}</Option>);
 }
 
 const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, onSubmit, onCancel}) => {
     const validationSchema = yup.object().shape({
-        title: yup.string().max(50).min(5).required(),
+        name: yup.string().max(50).min(5).required(),
         detail: yup.string().max(500).min(50).required(),
         price: yup.number().min(0).positive().required(),
-        category: yup.string().max(500).min(50).required(),
+        category: yup.array().required(),
         stock: yup.string().min(0).required(),
         status: yup.boolean().required(),
         image: yup.string().required(),
     })
 
-    const {control, errors, handleSubmit, reset} = useForm<ProductsValues>({
+    const [loadingImage, setLoadingImage] = useState<boolean>(false)
+
+    const {control, errors, handleSubmit, reset, setValue, watch, register} = useForm<ProductsValues>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             ...initialValues
         }
     })
 
-    const getFiles = files =>{
-        let base = (document.getElementById('image') as HTMLInputElement);
-        base.value = files.base64
-    }
-
     useEffect(() => {
         reset(initialValues)
+        register('image')
     }, [initialValues])
+
+    const imageValue = watch('image');
+
+    function beforeUpload(file) {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg';
+        if (!isJpgOrPng) {
+            message.error("El formato no es permitido. Los formatos permitidos son: jpeg, jpg, png");
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            message.error("El peso es superior a 2MB");
+        }
+        return isJpgOrPng && isLt2M;
+    }
+
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    const onChange = async (info) => {
+        const nextState: any = {};
+        switch (info.file.status) {
+            case "uploading":
+                setLoadingImage(true)
+                nextState.image = info.file;
+                nextState.image.url = await getBase64(info.file.originFileObj);
+                break;
+
+            case "done":
+                nextState.image = info.file;
+                setLoadingImage(false);
+                break;
+
+            default:
+                setLoadingImage(false);
+        }
+        setValue('image', nextState?.image?.url);
+    };
 
     return (
         <Form layout={'vertical'} onFinish={handleSubmit(onSubmit)}>
@@ -77,14 +118,14 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     control={control}
                 />
             </Form.Item>
-            <Form.Item label={"Título"}>
+            <Form.Item label={"Nombre"}>
                 <Controller
-                    name={'title'}
+                    name={'name'}
                     as={Input}
                     control={control}
                 />
                 {
-                    errors.title && <Text type={'danger'}>{errors.title.message}</Text>
+                    errors.name && <Text type={'danger'}>{errors.name.message}</Text>
                 }
             </Form.Item>
             <Form.Item label={"Detalle"}>
@@ -99,46 +140,49 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
             </Form.Item>
             <Form.Item label={"Categoria"}>
                 <Controller
+                    mode="multiple"
                     name={'category'}
                     as={Select}
-                    showArrow
-                    tagRender={tagRender}
+                    allowClear
+                    placeholder={"Por favor selecciona"}
                     style={{ width: '100%'}}
-                    options={options}
                     control={control}
+                    children={children}
                 />
                 {
-                    errors.category && <Text type={'danger'}>{errors.category.message}</Text>
+                    errors.category && <Text type={'danger'}>{errors.category}</Text>
                 }
             </Form.Item>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
-                <Col span={12}>
+                <Col span={8}>
                     <Form.Item label={"Precio"}>
                         <Controller
                             name={'price'}
                             as={Input}
                             type={'number'}
                             control={control}
+                            min={0}
                         />
                         {
                             errors.price && <Text type={'danger'}>{errors.price.message}</Text>
                         }
                     </Form.Item>
                 </Col>
-                <Col span={12}>
+                <Col span={8}>
                     <Form.Item label={"Stock"}>
                         <Controller
                             name={'stock'}
                             as={Input}
                             type={'number'}
                             control={control}
+                            min={0}
                         />
                         {
                             errors.stock && <Text type={'danger'}>{errors.stock.message}</Text>
                         }
                     </Form.Item>
                 </Col>
-                <Col span={12}>
+                <Col span={8}>
                     <Form.Item label={"Estatus"}>
                         <Controller
                             name={'status'}
@@ -154,25 +198,30 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     </Form.Item>
                 </Col>
             </Row>
-            <Form.Item label={"Imagen"}>
-                <FileBase64
-                    multiple={false}
-                    accept={'image/*'}
-                    onDone={getFiles.bind(this)}
-                />
-                {
-                    errors.image && <Text type={'danger'}>{errors.image.message}</Text>
-                }
-            </Form.Item>
-
-            <Form.Item label={"Imagen"}>
-                <Controller
-                    id={'image'}
-                    itemID={'image'}
-                    name={'image'}
-                    as={Input}
-                    control={control}
-                />
+            <Form.Item label={"Imagen"} style={{width:'100%', display:'flex',justifyContent:'center',textAlign:'center'}}>
+                <Upload
+                    name="image"
+                    listType="picture-card"
+                    className="avatar-uploader"
+                    showUploadList={false}
+                    customRequest={() => {
+                    }}
+                    beforeUpload={beforeUpload}
+                    onChange={info => {
+                        onChange(info)
+                    }}
+                >
+                    {
+                        imageValue ?
+                            <img src={imageValue} alt="avatar"
+                                 style={{width: '100%'}}/>
+                            :
+                            <div>
+                                <PlusCircleOutlined />
+                                <div className="ant-upload-text">Subir Imagen</div>
+                            </div>
+                    }
+                </Upload>
             </Form.Item>
 
 

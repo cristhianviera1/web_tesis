@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Input} from 'antd';
+import {Button, Card, Checkbox, Form, Input, message} from 'antd';
 import logoCircular from '../assets/logos/logo-circular.png';
 import {KeyOutlined, LoginOutlined, MailOutlined} from '@ant-design/icons';
-import {history} from '../redux/_helpers/history';
-import {userActions} from '../redux/_actions/user-actions';
+import {history} from '../components/_helpers/history';
+import {axiosConfig} from '../components/_helpers/axiosConfig';
 import './Login.css';
 
 const layout = {
@@ -26,6 +26,24 @@ class Login extends Component {
         }
     }
 
+    logIn(data) {
+        axiosConfig().post('/auth/sign-in',data).then(response => {
+            if (response) {
+                localStorage.setItem('token', response.data.accessToken);
+                localStorage.setItem('auth', 'true');
+                history.push('/administrator');
+                window.location.reload();
+                message.success("Bienvenido")
+            }
+        })
+        .catch((error) => {
+            if (error?.response?.data?.message) {
+                return message.error(error?.response?.data?.message);
+            }
+            return message.error("No se pudo iniciar sesión, por favor inténtelo mas tarde")
+        })
+    }
+
     componentWillMount() {
         if (localStorage.getItem('auth')) {
             history.push('/administrator');
@@ -34,8 +52,7 @@ class Login extends Component {
     }
 
     onFinish = (values: any) => {
-        console.log('Success:', values);
-        userActions.login(values['email'], values['password']);
+        this.logIn(values);
     };
 
     onFinishFailed = (errorInfo: any) => {

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route} from 'react-router-dom';
-import {PrivateRoute} from './redux/_components/PrivateRoute';
+import {PrivateRoute} from './components/_helpers/PrivateRoute';
 import './App.css';
 
 import Login from './pages/Login';

@@ -16,6 +16,7 @@ const NewProductsModal: FunctionComponent<NewProductsModalValues> = ({visible, i
     const [products, setProducts] = useState<ProductsTable>()
 
     const saveProduct = (data: ProductsValues) => {
+        console.log(data);
         setLoading(true);
         axiosConfig().post('products', data)
             .then(() => message.success("Se ha creado exitósamente el producto"))
@@ -27,7 +28,6 @@ const NewProductsModal: FunctionComponent<NewProductsModalValues> = ({visible, i
             })
             .finally(() => {
                 setLoading(false)
-                onClose();
             })
     }
 

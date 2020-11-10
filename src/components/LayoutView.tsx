@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Image, Layout, Menu} from 'antd';
 import {AppstoreOutlined, IdcardOutlined, NotificationOutlined, ShopOutlined} from '@ant-design/icons';
 import {BrowserRouter as Router, Link, Switch} from "react-router-dom";
-import {PrivateRoute} from '../redux/_components/PrivateRoute';
+import {PrivateRoute} from './_helpers/PrivateRoute';
 import {setLocale} from 'yup';
 
 // Views
