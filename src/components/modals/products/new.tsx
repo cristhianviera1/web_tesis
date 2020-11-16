@@ -13,17 +13,20 @@ interface NewProductsModalValues {
 
 const NewProductsModal: FunctionComponent<NewProductsModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [products, setProducts] = useState<ProductsTable>()
+    const [products, setProduct] = useState<ProductsTable>()
 
-    const saveProduct = (data: ProductsValues) => {
-        console.log(data);
+    const saveNewness = (data: ProductsValues) => {
         setLoading(true);
         axiosConfig().post('products', data)
-            .then(() => message.success("Se ha creado exitósamente el producto"))
+            .then(() => {
+                message.success("Se ha creado exitósamente el producto")
+                onClose();
+            })
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
                 }
+                console.log(error)
                 return message.error("No se ha podido crear el producto, vuelva a intentarlo más tarde")
             })
             .finally(() => {
@@ -40,7 +43,7 @@ const NewProductsModal: FunctionComponent<NewProductsModalValues> = ({visible, i
             <ProductsForm
                 loading={loading}
                 initialValues={initialValues}
-                onSubmit={saveProduct}
+                onSubmit={saveNewness}
                 onCancel={onClose}
             />
         </Modal>

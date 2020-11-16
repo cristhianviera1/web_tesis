@@ -140,6 +140,9 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
                             </div>
                     }
                 </Upload>
+                {
+                    errors.image && <Text type={'danger'}>{errors.image.message}</Text>
+                }
             </Form.Item>
 
 

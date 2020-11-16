@@ -1,32 +1,29 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
-import {ProductsTable} from "../../../pages/admin/products/Products";
-import ProductsForm , {ProductsValues} from "../../forms/products/products-form";
+import {UsersTable} from "../../../pages/admin/users/Users";
+import UsersForm , {UsersValues} from "../../forms/users/users-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
-interface EditProductModalValues {
+interface EditUserModalValues {
     visible: boolean,
-    initialValues: ProductsValues,
+    initialValues: UsersValues,
 
     onClose(): void
 }
 
-const EditProductModal: FunctionComponent<EditProductModalValues> = ({visible, initialValues, onClose}) => {
+const EditUserModal: FunctionComponent<EditUserModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [products, setProduct] = useState<ProductsTable>()
+    const [users, setUsers] = useState<UsersTable>()
 
-    const saveProduct = (data: ProductsValues) => {
+    const saveUsers = (data: UsersValues) => {
         setLoading(true);
-        axiosConfig().put('products', data)
-            .then(() => {
-                message.success("Se ha editado exitósamente el producto");
-                onClose();
-            })
+        axiosConfig().put('users', data)
+            .then(() => message.success("Se ha editado exitosamente el usuario"))
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
                 }
-                return message.error("No se ha podido actualizar el producto, vuelva a intentarlo más tarde")
+                return message.error("No se ha podido actualizar el usuario, vuelva a intentarlo más tarde")
             })
             .finally(() => setLoading(false))
     }
@@ -38,13 +35,13 @@ const EditProductModal: FunctionComponent<EditProductModalValues> = ({visible, i
             closable={false}
             footer={null}
         >
-            <ProductsForm
+            <UsersForm
                 loading={loading}
-                onSubmit={saveProduct}
+                onSubmit={saveUsers}
                 initialValues={initialValues}
                 onCancel={onClose}
             />
         </Modal>
     );
 }
-export default EditProductModal;
+export default EditUserModal;

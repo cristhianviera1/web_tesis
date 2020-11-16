@@ -1,29 +1,26 @@
 import React, {FunctionComponent, useEffect, useState} from "react";
-import {Button, Form, Input, Space, Typography, Row, Col, Switch, Select, Upload, message} from "antd";
+import {Button, Col, Form, Input, InputNumber, message, Radio, Row, Space, Switch, Typography, Upload} from "antd";
 import * as yup from 'yup';
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
-import {CheckOutlined, CloseOutlined, PlusCircleOutlined} from "@ant-design/icons";
+import {PlusCircleOutlined} from "@ant-design/icons";
 
 const {Text} = Typography
-const { TextArea } = Input;
-const { Option } = Select;
+const {TextArea} = Input;
 
+const options = [
+    { label: 'Activo', value: 'true' },
+    { label: 'Inactivo', value: 'false' },
+];
 
 export interface ProductsValues {
-    id?: string;
+    _id?: string;
     name: string;
     detail: string;
     price: number;
-    category: [];
     stock: number;
     status?: boolean;
     image: string;
-}
-
-export interface  Category {
-    _id_: string;
-    name: string;
 }
 
 interface ProductsForm {
@@ -33,25 +30,18 @@ interface ProductsForm {
     onSubmit(data: ProductsValues): void
 
     onCancel(): void
-}
 
-const children = [];
-for (let i = 10; i < 36; i++) {
-    // @ts-ignore
-    children.push(<Option key={i}>{i.toString(36) + i}</Option>);
 }
 
 const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, onSubmit, onCancel}) => {
     const validationSchema = yup.object().shape({
         name: yup.string().max(50).min(5).required(),
         detail: yup.string().max(500).min(50).required(),
-        price: yup.number().min(0).positive().required(),
-        category: yup.array().required(),
-        stock: yup.string().min(0).required(),
+        price: yup.number().min(0).required(),
+        stock: yup.number().min(0).required(),
         status: yup.boolean().required(),
         image: yup.string().required(),
     })
-
     const [loadingImage, setLoadingImage] = useState<boolean>(false)
 
     const {control, errors, handleSubmit, reset, setValue, watch, register} = useForm<ProductsValues>({
@@ -60,7 +50,6 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
             ...initialValues
         }
     })
-
     useEffect(() => {
         reset(initialValues)
         register('image')
@@ -113,7 +102,7 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
         <Form layout={'vertical'} onFinish={handleSubmit(onSubmit)}>
             <Form.Item label={"ID"} hidden={true}>
                 <Controller
-                    name={'id'}
+                    name={'_id'}
                     as={Input}
                     control={control}
                 />
@@ -138,30 +127,28 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     errors.detail && <Text type={'danger'}>{errors.detail.message}</Text>
                 }
             </Form.Item>
-            <Form.Item label={"Categoria"}>
-                <Controller
-                    mode="multiple"
-                    name={'category'}
-                    as={Select}
-                    allowClear
-                    placeholder={"Por favor selecciona"}
-                    style={{ width: '100%'}}
-                    control={control}
-                    children={children}
-                />
-                {
-                    errors.category && <Text type={'danger'}>{errors.category}</Text>
-                }
-            </Form.Item>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
+                <Col span={8}>
+                    <Form.Item label={"Estatus"}>
+                        <Controller
+                            name={'status'}
+                            as={Switch}
+                            control={control}
+                            defaultChecked
+                        />
+                        {
+                            errors.status && <Text type={'danger'}>{errors.status.message}</Text>
+                        }
+                    </Form.Item>
+                </Col>
                 <Col span={8}>
                     <Form.Item label={"Precio"}>
                         <Controller
                             name={'price'}
-                            as={Input}
-                            type={'number'}
-                            control={control}
+                            as={InputNumber}
                             min={0}
+                            step={0.1}
+                            control={control}
                         />
                         {
                             errors.price && <Text type={'danger'}>{errors.price.message}</Text>
@@ -172,28 +159,12 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     <Form.Item label={"Stock"}>
                         <Controller
                             name={'stock'}
-                            as={Input}
-                            type={'number'}
-                            control={control}
+                            as={InputNumber}
                             min={0}
+                            control={control}
                         />
                         {
                             errors.stock && <Text type={'danger'}>{errors.stock.message}</Text>
-                        }
-                    </Form.Item>
-                </Col>
-                <Col span={8}>
-                    <Form.Item label={"Estatus"}>
-                        <Controller
-                            name={'status'}
-                            as={Switch}
-                            checkedChildren={<CheckOutlined />}
-                            unCheckedChildren={<CloseOutlined />}
-                            defaultChecked
-                            control={control}
-                        />
-                        {
-                            errors.status && <Text type={'danger'}>{errors.status.message}</Text>
                         }
                     </Form.Item>
                 </Col>
@@ -222,6 +193,9 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                             </div>
                     }
                 </Upload>
+                {
+                    errors.image && <Text type={'danger'}>{errors.image.message}</Text>
+                }
             </Form.Item>
 
 

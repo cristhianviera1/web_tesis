@@ -21,12 +21,8 @@ class LayoutView extends Component {
         return <Layout>
             <Router>
                 <Sider breakpoint="lg" collapsedWidth="0"
-                       onBreakpoint={(broken: any) => {
-                           //console.log(broken);
-                       }}
-                       onCollapse={(collapsed: any, type: any) => {
-                           //console.log(collapsed, type);
-                       }}>
+                       onBreakpoint={(broken: any) => {}}
+                       onCollapse={(collapsed: any, type: any) => {}}>
 
                     <div style={{height: "10%", margin: "16px"}}>
                         <Image width={"100%"} src={require("../assets/logos/logo-largo.png")}/>
@@ -95,10 +91,12 @@ setLocale({
         required: "El campo es requerido"
     },
     string: {
-        // eslint-disable-next-line no-template-curly-in-string
         min: "Mínimo ${min} caracteres",
-        // eslint-disable-next-line no-template-curly-in-string
         max: "Máximo ${max} caracteres",
         email: "Ingrese un email válido"
+    },
+    number: {
+        min: "Mínimo ${min} números",
+        max: "Máximo ${max} números",
     }
 });

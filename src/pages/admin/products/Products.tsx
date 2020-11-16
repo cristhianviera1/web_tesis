@@ -15,12 +15,11 @@ const customizeRenderEmpty = () => (
 );
 
 export interface ProductsTable {
-    id: string;
+    _id: string;
     key: number;
     name: string;
     detail: string;
     price: string;
-    category: [];
     stock: number;
     status: boolean;
     image: string;
@@ -45,13 +44,12 @@ class Products extends Component {
                 this.setState({
                     products: data?.map((order, index) => ({
                         "key": index + 1,
-                        "id": order?._id,
+                        "_id": order?._id,
                         "name": order?.name,
                         "detail": order?.detail,
                         "price": order?.price,
-                        "category": order?.category,
                         "stock": order?.stock,
-                        "status": order?.status,
+                        "status": order?.status.toString(),
                         "image": order?.image,
                     }))
                 });
@@ -65,7 +63,7 @@ class Products extends Component {
     }
 
     deleteProduct(product) {
-        axiosConfig().delete(`product/${product.id}`).then(() => message.success("Se ha eliminado exitósamente el producto"))
+        axiosConfig().delete(`product/${product._id}`).then(() => message.success("Se ha eliminado exitósamente el producto"))
             .catch((error) => {
                 if (error?.response?.data?.message) {
                     return message.error(error?.response?.data?.message);
@@ -186,10 +184,10 @@ class Products extends Component {
                 render: (key) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-                            this.setState({visibleEditModal: true, idNews:key-1});
+                            this.setState({visibleEditModal: true, idProduct:key-1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
-                            this.setState({idNews:key-1});
+                            this.setState({idProduct:key-1});
                             this.deleteProduct(this.state.products[this.state.idProduct])
                         }}/>
                     </Space>)
@@ -216,7 +214,6 @@ class Products extends Component {
                                     name: "",
                                     detail: "",
                                     price: 0,
-                                    category: [],
                                     stock: 0,
                                     status: true,
                                     image: "",
