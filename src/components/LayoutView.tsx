@@ -1,58 +1,109 @@
-import React, {Component} from 'react';
-import {Image, Layout, Menu} from 'antd';
-import {AppstoreOutlined, IdcardOutlined, NotificationOutlined, ShopOutlined} from '@ant-design/icons';
+import React, {FunctionComponent, useEffect, useState} from 'react';
+import {ConfigProvider, Image, Layout, Menu} from 'antd';
+import {
+    AppstoreOutlined,
+    DollarCircleOutlined,
+    IdcardOutlined,
+    LogoutOutlined,
+    NotificationOutlined,
+    ShopOutlined
+} from '@ant-design/icons';
 import {BrowserRouter as Router, Link, Switch} from "react-router-dom";
 import {PrivateRoute} from './_helpers/PrivateRoute';
 import {setLocale} from 'yup';
 
 // Views
-import HeaderView from './layout-items/HeaderView';
 import FooterView from './layout-items/FooterView';
 import Users from '../pages/admin/users/Users';
 import BranchOffice from '../pages/admin/branch-office/BranchOffice';
 import Newness from '../pages/admin/newness/Newness';
 import './LayoutView.css';
 import Products from "../pages/admin/products/Products";
+import {history} from "./_helpers/history";
+import esES from "antd/lib/locale/es_ES";
+import {allowedRolesEnum} from "./_helpers/checkRol";
+import jwt_decode from "jwt-decode";
 
 const {Sider, Content} = Layout;
 
-class LayoutView extends Component {
-    render() {
-        return <Layout>
+const LayoutView: FunctionComponent = () => {
+    const [collapsed, setCollapsed] = useState<boolean>(false);
+    const [user, setUser] = useState<allowedRolesEnum>();
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const decodedJWT: any = jwt_decode(token);
+        setUser(decodedJWT.roles);
+    }, [user])
+    return (
+        <Layout>
             <Router>
-                <Sider breakpoint="lg" collapsedWidth="0"
-                       onBreakpoint={(broken: any) => {}}
-                       onCollapse={(collapsed: any, type: any) => {}}>
-
-                    <div style={{height: "10%", margin: "16px"}}>
-                        <Image width={"100%"} src={require("../assets/logos/logo-largo.png")}/>
+                <Sider
+                    theme="light"
+                    style={{
+                        minHeight: "100vh",
+                        boxShadow: "0 2px 21px rgba(0,37,136,0.23)",
+                        position: "fixed",
+                        zIndex: 99
+                    }}
+                    breakpoint="lg"
+                    onBreakpoint={(breakPoint) => setCollapsed(breakPoint)}
+                    collapsedWidth="0"
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            width: "100%",
+                            marginTop: '15px',
+                            alignItems: "center",
+                            justifyContent: "center"
+                        }}
+                    >
+                        <Image
+                            width={100}
+                            height={"auto"}
+                            preview={false}
+                            src={require("../assets/logos/logo-largo.png")}
+                        />
                     </div>
-                    <Menu theme="dark" mode="inline">
+                    <Menu theme="light" mode="inline">
                         {routes?.map((routeData, index) => {
-                            return (
-                                <Menu.Item key={index} icon={routeData.icon}><Link
-                                    to={routeData.path}>{routeData.name}</Link></Menu.Item>
-                            )
+                            console.log(user);
+                            if (routeData.roles.includes(user)) {
+                                return (
+                                    <Menu.Item key={index} icon={routeData.icon}><Link
+                                        to={routeData.path}>{routeData.name}</Link></Menu.Item>
+                                );
+                            }
                         })}
+                        <Menu.Item key={routes.length + 1} icon={<LogoutOutlined/>} onClick={() => {
+                            localStorage.removeItem('auth');
+                            localStorage.removeItem('token');
+                            history.push('/');
+                            window.location.reload();
+                        }}>Cerrar sesión
+                        </Menu.Item>
                     </Menu>
                 </Sider>
-                <Layout>
-                    <HeaderView/>
-                    <Content style={{margin: "24px 16px 0"}}>
-                        <div style={{padding: 24, minHeight: 500}}>
+                <Layout style={{
+                    marginLeft: collapsed ? 0 : 200,
+                    minHeight: "100vh",
+                    padding: "3% 3% 0 3%"
+                }}>
+                    <ConfigProvider locale={esES}>
+                        <Content>
                             <Switch>
                                 {routes.map((route, index) => (
                                     <PrivateRoute key={index} path={route.path} exact={route.exact}
                                                   children={<route.main/>}/>
                                 ))}
                             </Switch>
-                        </div>
-                    </Content>
+                        </Content>
+                    </ConfigProvider>
                     <FooterView/>
                 </Layout>
             </Router>
         </Layout>
-    }
+    );
 }
 
 export default LayoutView;
@@ -64,25 +115,36 @@ const routes = [
         exact: true,
         name: "Usuarios",
         icon: <IdcardOutlined/>,
-        main: () => <Users/>
+        main: () => <Users/>,
+        roles: [allowedRolesEnum.ADMIN]
     },
     {
         path: "/administrator/newness",
         name: "Novedades",
         icon: <NotificationOutlined/>,
-        main: () => <Newness/>
+        main: () => <Newness/>,
+        roles: [allowedRolesEnum.ADMIN]
     },
     {
         path: "/administrator/branch-offices",
         name: "Sucursales",
-        icon: <ShopOutlined />,
-        main: () => <BranchOffice/>
+        icon: <ShopOutlined/>,
+        main: () => <BranchOffice/>,
+        roles: [allowedRolesEnum.ADMIN]
     },
     {
         path: "/administrator/products",
         name: "Productos",
         icon: <AppstoreOutlined/>,
-        main: () => <Products/>
+        main: () => <Products/>,
+        roles: [allowedRolesEnum.ADMIN]
+    },
+    {
+        path: "/administrator/products",
+        name: "Pedidos",
+        icon: <DollarCircleOutlined/>,
+        main: () => <Products/>,
+        roles: [allowedRolesEnum.ADMIN, allowedRolesEnum.BRANCH_ADMIN]
     }
 ];
 
@@ -91,12 +153,12 @@ setLocale({
         required: "El campo es requerido"
     },
     string: {
-        min: "Mínimo ${min} caracteres",
-        max: "Máximo ${max} caracteres",
+        min: (min) => `Mínimo ${min} caracteres`,
+        max: (max) => `Máximo ${max} caracteres`,
         email: "Ingrese un email válido"
     },
     number: {
-        min: "Mínimo ${min} números",
-        max: "Máximo ${max} números",
+        min: (min) => `Mínimo ${min} números`,
+        max: (max) => `Máximo ${max} números`,
     }
 });

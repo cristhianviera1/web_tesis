@@ -1,18 +1,12 @@
 import React, {Component} from 'react';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import {Button, Col, ConfigProvider, Empty, Input, message, Row, Space, Table, Typography} from 'antd';
+import {Button, Col, Input, message, Row, Space, Table, Typography} from 'antd';
 import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import NewProductsModal from "../../../components/modals/products/new";
 import EditProductModal from "../../../components/modals/products/edit";
 
 const {Title} = Typography;
-
-const customizeRenderEmpty = () => (
-    <div style={{textAlign: 'center'}}>
-        <Empty description={<span>No se encontraron datos</span>}/>
-    </div>
-);
 
 export interface ProductsTable {
     _id: string;
@@ -34,7 +28,7 @@ class Products extends Component {
         visibleEditModal: false,
         visibleNewModal: false,
         loading: false,
-        idProduct:0,
+        idProduct: 0,
     };
 
     getProducts() {
@@ -69,17 +63,17 @@ class Products extends Component {
                     return message.error(error?.response?.data?.message);
                 }
                 return message.error("No se pudo eliminar el producto, por favor intentelo mas tarde")
-            }).finally(()=> this.getProducts())
+            }).finally(() => this.getProducts())
     }
 
     async componentDidMount() {
-       this.getProducts();
+        this.getProducts();
     }
 
     // Filtro de busqueda
     getColumnSearchProps = dataIndex => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }}>
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
+            <div style={{padding: 8}}>
                 <Input
                     ref={node => {
                         // @ts-ignore
@@ -89,25 +83,25 @@ class Products extends Component {
                     value={selectedKeys[0]}
                     onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                    style={{width: 188, marginBottom: 8, display: 'block'}}
                 />
                 <Space>
                     <Button
                         type="primary"
                         onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
+                        icon={<SearchOutlined/>}
                         size="small"
-                        style={{ width: 90 }}
+                        style={{width: 90}}
                     >
                         Buscar
                     </Button>
-                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{width: 90}}>
                         Restaurar
                     </Button>
                 </Space>
             </div>
         ),
-        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        filterIcon: filtered => <SearchOutlined style={{color: filtered ? '#1890ff' : undefined}}/>,
         onFilter: (value, record) =>
             record[dataIndex]
                 ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
@@ -121,7 +115,7 @@ class Products extends Component {
         render: text =>
             this.state.searchedColumn === dataIndex ? (
                 <Highlighter
-                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    highlightStyle={{backgroundColor: '#ffc069', padding: 0}}
                     searchWords={[this.state.searchText]}
                     autoEscape
                     textToHighlight={text ? text.toString() : ''}
@@ -141,7 +135,7 @@ class Products extends Component {
 
     handleReset = clearFilters => {
         clearFilters();
-        this.setState({ searchText: '' });
+        this.setState({searchText: ''});
     };
 
 
@@ -184,10 +178,10 @@ class Products extends Component {
                 render: (key) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-                            this.setState({visibleEditModal: true, idProduct:key-1});
+                            this.setState({visibleEditModal: true, idProduct: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
-                            this.setState({idProduct:key-1});
+                            this.setState({idProduct: key - 1});
                             this.deleteProduct(this.state.products[this.state.idProduct])
                         }}/>
                     </Space>)
@@ -228,24 +222,22 @@ class Products extends Component {
                 </Row>
             </div>
 
-            <ConfigProvider renderEmpty={customizeRenderEmpty}>
-                <Table
-                    columns={columns}
-                    dataSource={this.state.products}
-                    scroll={{x: 'max-content'}}
-                    loading={this.state.loading}/>
-                {
-                    this.state.visibleEditModal &&
-                    <EditProductModal
-                        visible={this.state.visibleEditModal}
-                        initialValues={this.state.products[this.state.idProduct]}
-                        onClose={() => {
-                            this.getProducts();
-                            this.setState({visibleEditModal: false})
-                        }}
-                    />
-                }
-            </ConfigProvider>
+            <Table
+                columns={columns}
+                dataSource={this.state.products}
+                scroll={{x: 'max-content'}}
+                loading={this.state.loading}/>
+            {
+                this.state.visibleEditModal &&
+                <EditProductModal
+                    visible={this.state.visibleEditModal}
+                    initialValues={this.state.products[this.state.idProduct]}
+                    onClose={() => {
+                        this.getProducts();
+                        this.setState({visibleEditModal: false})
+                    }}
+                />
+            }
         </div>
     }
 }

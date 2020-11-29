@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Col, ConfigProvider, Empty, message, Row, Space, Table, Typography, Image, Input} from 'antd';
+import {Button, Col, Image, Input, message, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
@@ -8,12 +8,6 @@ import EditNewnessModal from "../../../components/modals/newness/edit";
 import Highlighter from "react-highlight-words";
 
 const {Title} = Typography;
-
-const customizeRenderEmpty = () => (
-    <div style={{textAlign: 'center'}}>
-        <Empty description={<span>No se encontraron datos</span>}/>
-    </div>
-);
 
 export interface NewnessTable {
     _id: string;
@@ -32,7 +26,7 @@ class Newness extends Component {
         loading: false,
         visibleEditModal: false,
         visibleNewModal: false,
-        idNews:0,
+        idNews: 0,
     };
 
     getNewness() {
@@ -64,7 +58,7 @@ class Newness extends Component {
                     return message.error(error?.response?.data?.message);
                 }
                 return message.error("No se pudo eliminar la novedad, por favor intentelo mas tarde")
-            }).finally(()=> this.getNewness())
+            }).finally(() => this.getNewness())
     }
 
     componentDidMount() {
@@ -73,8 +67,8 @@ class Newness extends Component {
 
     // Filtro de busqueda
     getColumnSearchProps = dataIndex => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }}>
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
+            <div style={{padding: 8}}>
                 <Input
                     ref={node => {
                         // @ts-ignore
@@ -84,25 +78,25 @@ class Newness extends Component {
                     value={selectedKeys[0]}
                     onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                    style={{width: 188, marginBottom: 8, display: 'block'}}
                 />
                 <Space>
                     <Button
                         type="primary"
                         onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
+                        icon={<SearchOutlined/>}
                         size="small"
-                        style={{ width: 90 }}
+                        style={{width: 90}}
                     >
                         Buscar
                     </Button>
-                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{width: 90}}>
                         Restaurar
                     </Button>
                 </Space>
             </div>
         ),
-        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        filterIcon: filtered => <SearchOutlined style={{color: filtered ? '#1890ff' : undefined}}/>,
         onFilter: (value, record) =>
             record[dataIndex]
                 ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
@@ -116,7 +110,7 @@ class Newness extends Component {
         render: text =>
             this.state.searchedColumn === dataIndex ? (
                 <Highlighter
-                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    highlightStyle={{backgroundColor: '#ffc069', padding: 0}}
                     searchWords={[this.state.searchText]}
                     autoEscape
                     textToHighlight={text ? text.toString() : ''}
@@ -136,7 +130,7 @@ class Newness extends Component {
 
     handleReset = clearFilters => {
         clearFilters();
-        this.setState({ searchText: '' });
+        this.setState({searchText: ''});
     };
 
     render() {
@@ -163,7 +157,7 @@ class Newness extends Component {
                 title: 'Imagen',
                 dataIndex: 'image',
                 key: 'image',
-                render:(image) => (
+                render: (image) => (
                     <Image
                         width={150}
                         height={150}
@@ -179,10 +173,10 @@ class Newness extends Component {
                 render: (key) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-                            this.setState({visibleEditModal: true, idNews:key-1});
+                            this.setState({visibleEditModal: true, idNews: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
-                            this.setState({idNews:key-1});
+                            this.setState({idNews: key - 1});
                             this.deleteNewness(this.state.newness[this.state.idNews])
                         }}/>
                     </Space>)
@@ -218,25 +212,23 @@ class Newness extends Component {
                     </Col>
                 </Row>
             </div>
-            <ConfigProvider renderEmpty={customizeRenderEmpty}>
-                <Table
-                    columns={columns}
-                    dataSource={this.state.newness}
-                    scroll={{x: 'max-content'}}
-                    loading={this.state.loading}
+            <Table
+                columns={columns}
+                dataSource={this.state.newness}
+                scroll={{x: 'max-content'}}
+                loading={this.state.loading}
+            />
+            {
+                this.state.visibleEditModal &&
+                <EditNewnessModal
+                    visible={this.state.visibleEditModal}
+                    initialValues={this.state.newness[this.state.idNews]}
+                    onClose={() => {
+                        this.getNewness();
+                        this.setState({visibleEditModal: false})
+                    }}
                 />
-                {
-                    this.state.visibleEditModal &&
-                    <EditNewnessModal
-                        visible={this.state.visibleEditModal}
-                        initialValues={this.state.newness[this.state.idNews]}
-                        onClose={() => {
-                            this.getNewness();
-                            this.setState({visibleEditModal: false})
-                        }}
-                    />
-                }
-            </ConfigProvider>
+            }
         </div>
     }
 }

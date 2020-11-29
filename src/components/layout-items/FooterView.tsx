@@ -7,7 +7,7 @@ const {Footer} = Layout;
 class FooterView extends Component {
     render() {
         return <Footer style={{textAlign: 'center'}}>
-            Kimirina ©2020 Created by Los duros del software
+            ©2020 Made with ❤ by Kitty Cat
         </Footer>
     }
 }

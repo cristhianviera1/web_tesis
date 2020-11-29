@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Col, ConfigProvider, Empty, Input, message, Row, Space, Table, Typography} from 'antd';
+import {Button, Col, Input, message, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
@@ -8,12 +8,6 @@ import EditBranchModal from "../../../components/modals/branch_offices/edit";
 import NewBranchModal from "../../../components/modals/branch_offices/new";
 
 const {Title} = Typography;
-
-const customizeRenderEmpty = () => (
-    <div style={{textAlign: 'center'}}>
-        <Empty description={<span>No se encontraron datos</span>}/>
-    </div>
-);
 
 export interface BranchOfficeTable {
     id: string;
@@ -33,7 +27,7 @@ class BranchOffice extends Component {
         loading: false,
         visibleEditModal: false,
         visibleNewModal: false,
-        idOffice:0,
+        idOffice: 0,
     };
 
     getBranchOffices() {
@@ -56,22 +50,19 @@ class BranchOffice extends Component {
                     }))
                 });
             })
-            .catch((error) => {
-                if (error?.response?.data?.message) {
-                    return message.error(error?.response?.data?.message);
-                }
-                return message.error("No se pudieron obtener las sucursales, por favor recargue la página")
+            .catch(() => {
+
             }).finally(() => this.setState({loading: false}));
     }
 
     deleteBranchOffice(branchOffice) {
         axiosConfig().delete(`branch-offices/${branchOffice.id}`).then(() => message.success("Se ha eliminado exitósamente la sucursal"))
             .catch((error) => {
-            if (error?.response?.data?.message) {
-                return message.error(error?.response?.data?.message);
-            }
-            return message.error("No se pudo eliminar la sucursal, por favor intentelo mas tarde")
-        }).finally(()=> this.getBranchOffices())
+                if (error?.response?.data?.message) {
+                    return message.error(error?.response?.data?.message);
+                }
+                return message.error("No se pudo eliminar la sucursal, por favor intentelo mas tarde")
+            }).finally(() => this.getBranchOffices())
     }
 
     componentDidMount() {
@@ -80,8 +71,8 @@ class BranchOffice extends Component {
 
     // Filtro de busqueda
     getColumnSearchProps = dataIndex => ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-            <div style={{ padding: 8 }}>
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
+            <div style={{padding: 8}}>
                 <Input
                     ref={node => {
                         // @ts-ignore
@@ -91,25 +82,25 @@ class BranchOffice extends Component {
                     value={selectedKeys[0]}
                     onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                     onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                    style={{width: 188, marginBottom: 8, display: 'block'}}
                 />
                 <Space>
                     <Button
                         type="primary"
                         onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                        icon={<SearchOutlined />}
+                        icon={<SearchOutlined/>}
                         size="small"
-                        style={{ width: 90 }}
+                        style={{width: 90}}
                     >
                         Buscar
                     </Button>
-                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{width: 90}}>
                         Restaurar
                     </Button>
                 </Space>
             </div>
         ),
-        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        filterIcon: filtered => <SearchOutlined style={{color: filtered ? '#1890ff' : undefined}}/>,
         onFilter: (value, record) =>
             record[dataIndex]
                 ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
@@ -123,7 +114,7 @@ class BranchOffice extends Component {
         render: text =>
             this.state.searchedColumn === dataIndex ? (
                 <Highlighter
-                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    highlightStyle={{backgroundColor: '#ffc069', padding: 0}}
                     searchWords={[this.state.searchText]}
                     autoEscape
                     textToHighlight={text ? text.toString() : ''}
@@ -143,7 +134,7 @@ class BranchOffice extends Component {
 
     handleReset = clearFilters => {
         clearFilters();
-        this.setState({ searchText: '' });
+        this.setState({searchText: ''});
     };
 
     render() {
@@ -186,10 +177,10 @@ class BranchOffice extends Component {
                 render: (key) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-                            this.setState({visibleEditModal: true, idOffice:key-1});
+                            this.setState({visibleEditModal: true, idOffice: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
-                            this.setState({idOffice:key-1});
+                            this.setState({idOffice: key - 1});
                             this.deleteBranchOffice(this.state.branchOffices[this.state.idOffice])
                         }}/>
                     </Space>)
@@ -232,25 +223,23 @@ class BranchOffice extends Component {
                     </Col>
                 </Row>
             </div>
-            <ConfigProvider renderEmpty={customizeRenderEmpty}>
-                <Table
-                    columns={columns}
-                    dataSource={this.state.branchOffices}
-                    scroll={{x: 'max-content'}}
-                    loading={this.state.loading}
+            <Table
+                columns={columns}
+                dataSource={this.state.branchOffices}
+                scroll={{x: 'max-content'}}
+                loading={this.state.loading}
+            />
+            {
+                this.state.visibleEditModal &&
+                <EditBranchModal
+                    visible={this.state.visibleEditModal}
+                    initialValues={this.state.branchOffices[this.state.idOffice]}
+                    onClose={() => {
+                        this.getBranchOffices();
+                        this.setState({visibleEditModal: false})
+                    }}
                 />
-                {
-                    this.state.visibleEditModal &&
-                    <EditBranchModal
-                        visible={this.state.visibleEditModal}
-                        initialValues={this.state.branchOffices[this.state.idOffice]}
-                        onClose={() => {
-                            this.getBranchOffices();
-                            this.setState({visibleEditModal: false})
-                        }}
-                    />
-                }
-            </ConfigProvider>
+            }
         </div>
     }
 }
