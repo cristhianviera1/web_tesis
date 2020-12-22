@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import {Button, Col, Input, message, Row, Space, Table, Typography} from 'antd';
-import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
+import {Button, Col, Image, Avatar, Input, message, Row, Space, Table, Typography} from 'antd';
+import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, UserOutlined} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import NewUsersModal from "../../../components/modals/users/new";
 import EditUserModal from "../../../components/modals/users/edit";
@@ -21,6 +21,7 @@ export interface UsersTable {
     email: string;
     status?: boolean;
     roles: string;
+    image?: string;
 
 }
 
@@ -54,6 +55,7 @@ class Users extends Component {
                         "email": order?.email,
                         "status": order?.status,
                         "roles": order?.roles,
+                        "image": order?.image,
                     }))
                 });
             })
@@ -155,6 +157,13 @@ class Users extends Component {
                 title: 'ID',
                 dataIndex: 'key',
                 key: 'key',
+            },
+            {
+                dataIndex: 'image',
+                key: 'image',
+                render: (image) => (
+                    <Avatar size={44} icon={<UserOutlined />} src={image}/>
+                )
             },
             {
                 title: 'Nombre',
