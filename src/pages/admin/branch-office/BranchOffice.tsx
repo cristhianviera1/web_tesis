@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Button, Col, Input, message, Row, Space, Table, Typography} from 'antd';
+import {Button, Col, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
-import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
 import EditBranchModal from "../../../components/modals/branch_offices/edit";
@@ -55,14 +55,32 @@ class BranchOffice extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
+    confirmDeleteModal(branchOffice) {
+        return Modal.confirm({
+            title: "Eliminar Sucursal",
+            icon: <ExclamationCircleOutlined/>,
+            content: `¿Estás seguro que deseas eliminar la sucursal: ${branchOffice.name}?`,
+            okText: "Aceptar",
+            okType: "danger",
+            onOk: () => this.deleteBranchOffice(branchOffice),
+            visible: true,
+            cancelText: "Cancelar"
+        });
+    };
+
+
     deleteBranchOffice(branchOffice) {
-        axiosConfig().delete(`branch-offices/${branchOffice.id}`).then(() => message.success("Se ha eliminado exitósamente la sucursal"))
+        axiosConfig().delete(`branch-offices/${branchOffice.id}`)
+            .then(() => {
+                message.success("Se ha eliminado exitósamente la sucursal")
+            })
             .catch((error) => {
                 if (error?.response?.data?.message) {
                     return message.error(error?.response?.data?.message);
                 }
                 return message.error("No se pudo eliminar la sucursal, por favor intentelo mas tarde")
-            }).finally(() => this.getBranchOffices())
+            })
+            .finally(() => this.getBranchOffices())
     }
 
     componentDidMount() {
@@ -174,14 +192,14 @@ class BranchOffice extends Component {
                 title: 'Acciones',
                 dataIndex: 'key',
                 key: 'actions',
-                render: (key) => (
+                render: (key, record) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
                             this.setState({visibleEditModal: true, idOffice: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
                             this.setState({idOffice: key - 1});
-                            this.deleteBranchOffice(this.state.branchOffices[this.state.idOffice])
+                            this.confirmDeleteModal(record)
                         }}/>
                     </Space>)
             },

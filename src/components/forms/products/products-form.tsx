@@ -1,5 +1,5 @@
 import React, {FunctionComponent, useEffect, useState} from "react";
-import {Button, Col, Form, Input, InputNumber, message, Radio, Row, Space, Switch, Typography, Upload} from "antd";
+import {Button, Col, Form, Input, InputNumber, message, Row, Space, Switch, Typography, Upload} from "antd";
 import * as yup from 'yup';
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
@@ -107,7 +107,7 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     control={control}
                 />
             </Form.Item>
-            <Form.Item label={"Nombre"}>
+            <Form.Item label={"* Nombre"}>
                 <Controller
                     name={'name'}
                     as={Input}
@@ -117,7 +117,7 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     errors.name && <Text type={'danger'}>{errors.name.message}</Text>
                 }
             </Form.Item>
-            <Form.Item label={"Detalle"}>
+            <Form.Item label={"* Detalle"}>
                 <Controller
                     name={'detail'}
                     as={TextArea}
@@ -129,7 +129,7 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
             </Form.Item>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 <Col span={8}>
-                    <Form.Item label={"Estatus"}>
+                    <Form.Item label={"* Estado"}>
                         <Controller
                             name={'status'}
                             as={Switch}
@@ -142,7 +142,7 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     </Form.Item>
                 </Col>
                 <Col span={8}>
-                    <Form.Item label={"Precio"}>
+                    <Form.Item label={"* Precio"}>
                         <Controller
                             name={'price'}
                             as={InputNumber}
@@ -156,7 +156,7 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     </Form.Item>
                 </Col>
                 <Col span={8}>
-                    <Form.Item label={"Stock"}>
+                    <Form.Item label={"* Stock"}>
                         <Controller
                             name={'stock'}
                             as={InputNumber}
@@ -169,7 +169,8 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
                     </Form.Item>
                 </Col>
             </Row>
-            <Form.Item label={"Imagen"} style={{width:'100%', display:'flex',justifyContent:'center',textAlign:'center'}}>
+            <Form.Item label={"* Imagen"}
+                       style={{width: '100%', display: 'flex', justifyContent: 'center', textAlign: 'center'}}>
                 <Upload
                     name="image"
                     listType="picture-card"

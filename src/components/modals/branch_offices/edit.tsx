@@ -58,10 +58,11 @@ const EditBranchModal: FunctionComponent<EditBranchModalValues> = ({visible, ini
 
     return (
         <Modal
+            title={'Editar sucursal'}
             visible={visible}
             maskClosable={false}
-            closable={false}
             footer={null}
+            onCancel={onClose}
         >
             <BranchOfficeForm
                 loading={loading}

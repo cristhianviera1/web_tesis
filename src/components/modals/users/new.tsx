@@ -1,7 +1,7 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
 import {UsersTable} from "../../../pages/admin/users/Users";
-import UsersForm , {UsersValues} from "../../forms/users/users-form";
+import UsersForm, {UsersValues} from "../../forms/users/users-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
 interface NewUsersModalValues {
@@ -19,23 +19,27 @@ const NewUsersModal: FunctionComponent<NewUsersModalValues> = ({visible, initial
         console.log(data);
         setLoading(true);
         axiosConfig().post('users', data)
-            .then(() => message.success("Se ha creado exitosamente el usuario"))
+            .then(() => {
+                message.success("Se ha creado exitosamente el usuario");
+                onClose();
+            })
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
                 }
                 return message.error("No se ha podido crear el usuario, vuelva a intentarlo más tarde")
             })
-            .finally(() => {
-                setLoading(false)
-            })
+            .finally(() => setLoading(false))
     }
 
     return (
         <Modal
+            title={'Agregar usuario'}
             visible={visible}
             maskClosable={false}
-            footer={[]}
+            footer={null}
+            centered
+            onCancel={onClose}
         >
             <UsersForm
                 loading={loading}

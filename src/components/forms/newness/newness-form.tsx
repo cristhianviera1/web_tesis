@@ -96,7 +96,7 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
                     control={control}
                 />
             </Form.Item>
-            <Form.Item label={"Título"}>
+            <Form.Item label={"* Título"}>
                 <Controller
                     name={'title'}
                     as={Input}
@@ -106,17 +106,19 @@ const NewnessForm: FunctionComponent<NewnessForm> = ({initialValues, loading, on
                     errors.title && <Text type={'danger'}>{errors.title.message}</Text>
                 }
             </Form.Item>
-            <Form.Item label={"Descripción"}>
+            <Form.Item label={"* Descripción"}>
                 <Controller
                     name={'description'}
                     as={TextArea}
+                    rows={4}
                     control={control}
                 />
                 {
                     errors.description && <Text type={'danger'}>{errors.description.message}</Text>
                 }
             </Form.Item>
-            <Form.Item label={"Imagen"} style={{width:'100%', display:'flex',justifyContent:'center',textAlign:'center'}}>
+            <Form.Item label={"* Imagen"}
+                       style={{width: '100%', display: 'flex', justifyContent: 'center', textAlign: 'center'}}>
                 <Upload
                     name="image"
                     listType="picture-card"

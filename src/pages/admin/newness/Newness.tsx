@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Button, Col, Image, Input, message, Row, Space, Table, Typography} from 'antd';
+import {Button, Col, Image, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
-import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
 import NewNewnessModal from "../../../components/modals/newness/new";
 import EditNewnessModal from "../../../components/modals/newness/edit";
@@ -50,6 +50,19 @@ class Newness extends Component {
                 return message.error("No se pudieron obtener las novedades, por favor recargue la página")
             }).finally(() => this.setState({loading: false}));
     }
+
+    confirmDeleteModal(newness) {
+        return Modal.confirm({
+            title: "Eliminar Novedad",
+            icon: <ExclamationCircleOutlined/>,
+            content: `¿Estás seguro que deseas eliminar la novedad: ${newness.name}?`,
+            okText: "Aceptar",
+            okType: "danger",
+            onOk: () => this.deleteNewness(newness),
+            visible: true,
+            cancelText: "Cancelar"
+        });
+    };
 
     deleteNewness(newness) {
         axiosConfig().delete(`newness/${newness._id}`).then(() => message.success("Se ha eliminado exitósamente la novedad"))
@@ -170,14 +183,14 @@ class Newness extends Component {
                 title: 'Acciones',
                 dataIndex: 'key',
                 key: 'actions',
-                render: (key) => (
+                render: (key, record) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
                             this.setState({visibleEditModal: true, idNews: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
                             this.setState({idNews: key - 1});
-                            this.deleteNewness(this.state.newness[this.state.idNews])
+                            this.confirmDeleteModal(record)
                         }}/>
                     </Space>)
             },

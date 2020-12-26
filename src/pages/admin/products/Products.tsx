@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import {Button, Col, Image, Input, message, Row, Space, Table, Typography} from 'antd';
-import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
+import {Button, Col, Image, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
+import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import NewProductsModal from "../../../components/modals/products/new";
 import EditProductModal from "../../../components/modals/products/edit";
@@ -56,8 +56,21 @@ class Products extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
+    confirmDeleteModal(product) {
+        return Modal.confirm({
+            title: "Eliminar Producto",
+            icon: <ExclamationCircleOutlined/>,
+            content: `¿Estás seguro que deseas eliminar el producto: ${product.name}?`,
+            okText: "Aceptar",
+            okType: "danger",
+            onOk: () => this.deleteProduct(product),
+            visible: true,
+            cancelText: "Cancelar"
+        });
+    };
+
     deleteProduct(product) {
-        axiosConfig().delete(`product/${product._id}`).then(() => message.success("Se ha eliminado exitósamente el producto"))
+        axiosConfig().delete(`products/${product._id}`).then(() => message.success("Se ha eliminado exitósamente el producto"))
             .catch((error) => {
                 if (error?.response?.data?.message) {
                     return message.error(error?.response?.data?.message);
@@ -201,14 +214,14 @@ class Products extends Component {
                 title: 'Acciones',
                 dataIndex: 'key',
                 key: 'actions',
-                render: (key) => (
+                render: (key, record) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
                             this.setState({visibleEditModal: true, idProduct: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
                             this.setState({idProduct: key - 1});
-                            this.deleteProduct(this.state.products[this.state.idProduct])
+                            this.confirmDeleteModal(record)
                         }}/>
                     </Space>)
             },

@@ -1,7 +1,7 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
 import {NewnessTable} from "../../../pages/admin/newness/Newness";
-import NewnessForm , {NewnessValues} from "../../forms/newness/newness-form";
+import NewnessForm, {NewnessValues} from "../../forms/newness/newness-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
 interface NewNewnessModalValues {
@@ -36,9 +36,11 @@ const NewNewnessModal: FunctionComponent<NewNewnessModalValues> = ({visible, ini
 
     return (
         <Modal
+            title={"Agregar novedad"}
             visible={visible}
             maskClosable={false}
-            footer={[]}
+            footer={null}
+            onCancel={onClose}
         >
             <NewnessForm
                 loading={loading}

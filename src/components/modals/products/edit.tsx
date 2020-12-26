@@ -1,7 +1,7 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
 import {ProductsTable} from "../../../pages/admin/products/Products";
-import ProductsForm , {ProductsValues} from "../../forms/products/products-form";
+import ProductsForm, {ProductsValues} from "../../forms/products/products-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
 interface EditProductModalValues {
@@ -33,10 +33,11 @@ const EditProductModal: FunctionComponent<EditProductModalValues> = ({visible, i
 
     return (
         <Modal
+            title={'Editar producto'}
             visible={visible}
             maskClosable={false}
-            closable={false}
             footer={null}
+            onCancel={onClose}
         >
             <ProductsForm
                 loading={loading}

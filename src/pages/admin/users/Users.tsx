@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import {Button, Col, Image, Avatar, Input, message, Row, Space, Table, Typography} from 'antd';
-import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, UserOutlined} from "@ant-design/icons";
+import {Button, Col, Input, message, Modal, Row, Space, Table, Tag, Typography} from 'antd';
+import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import NewUsersModal from "../../../components/modals/users/new";
 import EditUserModal from "../../../components/modals/users/edit";
+import {PresetColorType, PresetStatusColorType} from "antd/lib/_util/colors";
 
-const {Title} = Typography;
+const {Title, Text} = Typography;
 
 export interface UsersTable {
     id: string;
@@ -17,13 +18,35 @@ export interface UsersTable {
     gender: string;
     birthday?: string;
     password: string;
-    phone: number;
     email: string;
     status?: boolean;
     roles: string;
     image?: string;
-
 }
+
+interface colors {
+    gender: string;
+    label: string;
+    color: PresetColorType | PresetStatusColorType
+}
+
+export const colorPeerGender: colors[] = [
+    {
+        gender: "man",
+        label: "Hombre",
+        color: "blue"
+    },
+    {
+        gender: "woman",
+        label: "Mujer",
+        color: "pink"
+    },
+    {
+        gender: "other",
+        label: "Otro",
+        color: "lime"
+    },
+]
 
 class Users extends Component {
 
@@ -67,14 +90,29 @@ class Users extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
-    deleteUser(product) {
-        axiosConfig().delete(`users/${product.id}`).then(() => message.success("Se ha eliminado exitósamente el usuario"))
+    confirmDeleteModal(user) {
+        return Modal.confirm({
+            title: "Eliminar Usuario",
+            icon: <ExclamationCircleOutlined/>,
+            content: `¿Estás seguro que deseas eliminar al usuario: ${user.name} ${user.surname}?`,
+            okText: "Aceptar",
+            okType: "danger",
+            onOk: () => this.deleteUser(user),
+            visible: true,
+            cancelText: "Cancelar"
+        });
+    };
+
+    deleteUser(user) {
+        axiosConfig().delete(`users/${user.id}`)
+            .then(() => message.warn("Se ha eliminado exitósamente el usuario"))
             .catch((error) => {
                 if (error?.response?.data?.message) {
                     return message.error(error?.response?.data?.message);
                 }
                 return message.error("No se pudo eliminar el usuario, por favor intentelo mas tarde")
-            }).finally(() => this.getUsers())
+            })
+            .finally(() => this.getUsers())
     }
 
     // Filtro de busqueda
@@ -169,19 +207,26 @@ class Users extends Component {
                 title: 'Nombre',
                 dataIndex: 'name',
                 key: 'name',
-                ...this.getColumnSearchProps('name')
+                render: (value, record) => (<Text>{`${record.name} ${record.surname}`}</Text>),
             },
             {
-                title: 'E-mail',
+                title: 'Correo electrónico',
                 dataIndex: 'email',
                 key: 'email',
                 ...this.getColumnSearchProps('email')
             },
             {
-                title: 'Gender',
+                title: 'Género',
                 dataIndex: 'gender',
                 key: 'gender',
-                ...this.getColumnSearchProps('gender')
+                render: (value) => {
+                    const foundGender = colorPeerGender.find((genders) => genders.gender === value);
+                    return (
+                        <Tag color={foundGender.color}>
+                            {foundGender.label}
+                        </Tag>
+                    );
+                },
             },
             {
                 title: 'Rol',
@@ -190,17 +235,25 @@ class Users extends Component {
                 ...this.getColumnSearchProps('roles')
             },
             {
+                title: 'Estado',
+                dataIndex: 'status',
+                key: 'status',
+                render: (key, record) => <Tag color={key ? "success" : "error"}>
+                    {key ? "Activo" : "Inactivo"}
+                </Tag>,
+            },
+            {
                 title: 'Acciones',
                 dataIndex: 'key',
                 key: 'actions',
-                render: (key) => (
+                render: (key, record) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
                             this.setState({visibleEditModal: true, idUser: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
                             this.setState({idNews: key - 1});
-                            this.deleteUser(this.state.users[this.state.idUser])
+                            this.confirmDeleteModal(record)
                         }}/>
                     </Space>)
             },
@@ -223,13 +276,11 @@ class Users extends Component {
                             <NewUsersModal
                                 visible={this.state.visibleNewModal}
                                 initialValues={{
-                                    dni: "",
                                     name: "",
                                     surname: "",
                                     gender: "",
-                                    birthday: "",
+                                    birthday: 0,
                                     password: "",
-                                    phone: 0,
                                     email: "",
                                     status: true,
                                     roles: "",

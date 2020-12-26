@@ -1,7 +1,7 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
 import {UsersTable} from "../../../pages/admin/users/Users";
-import UsersForm , {UsersValues} from "../../forms/users/users-form";
+import UsersForm, {UsersValues} from "../../forms/users/users-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
 interface EditUserModalValues {
@@ -16,9 +16,13 @@ const EditUserModal: FunctionComponent<EditUserModalValues> = ({visible, initial
     const [users, setUsers] = useState<UsersTable>()
 
     const saveUsers = (data: UsersValues) => {
+        console.log(data)
         setLoading(true);
         axiosConfig().put('users', data)
-            .then(() => message.success("Se ha editado exitosamente el usuario"))
+            .then(() => {
+                message.success("Se ha editado exitosamente el usuario");
+                onClose();
+            })
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
@@ -30,10 +34,12 @@ const EditUserModal: FunctionComponent<EditUserModalValues> = ({visible, initial
 
     return (
         <Modal
+            title={'Editar usuario'}
             visible={visible}
             maskClosable={false}
-            closable={false}
             footer={null}
+            centered
+            onCancel={onClose}
         >
             <UsersForm
                 loading={loading}

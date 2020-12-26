@@ -153,8 +153,8 @@ setLocale({
         required: "El campo es requerido"
     },
     string: {
-        min: (min) => `Mínimo ${min} caracteres`,
-        max: (max) => `Máximo ${max} caracteres`,
+        min: ({min}) => `Mínimo ${min} caracteres`,
+        max: ({max}) => `Máximo ${max} caracteres`,
         email: "Ingrese un email válido"
     },
     number: {

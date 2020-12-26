@@ -69,9 +69,11 @@ const NewBranchModal: FunctionComponent<NewBranchModalValues> = ({visible, initi
 
     return (
         <Modal
+            title={'Agregar sucursal'}
             visible={visible}
             maskClosable={false}
-            footer={[]}
+            footer={null}
+            onCancel={onClose}
         >
             <BranchOfficeForm
                 loading={loading}

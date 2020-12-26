@@ -1,7 +1,7 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
 import {ProductsTable} from "../../../pages/admin/products/Products";
-import ProductsForm , {ProductsValues} from "../../forms/products/products-form";
+import ProductsForm, {ProductsValues} from "../../forms/products/products-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
 interface NewProductsModalValues {
@@ -36,9 +36,11 @@ const NewProductsModal: FunctionComponent<NewProductsModalValues> = ({visible, i
 
     return (
         <Modal
+            title={'Agregar producto'}
             visible={visible}
             maskClosable={false}
-            footer={[]}
+            footer={null}
+            onCancel={onClose}
         >
             <ProductsForm
                 loading={loading}
