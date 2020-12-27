@@ -1,7 +1,14 @@
 import React, {Component} from 'react';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import {Button, Col, Input, message, Modal, Row, Space, Table, Tag, Typography} from 'antd';
-import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
+import {Avatar, Button, Col, Input, message, Modal, Row, Space, Table, Tag, Typography} from 'antd';
+import {
+    DeleteOutlined,
+    EditOutlined,
+    ExclamationCircleOutlined,
+    PlusOutlined,
+    SearchOutlined,
+    UserOutlined
+} from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import NewUsersModal from "../../../components/modals/users/new";
 import EditUserModal from "../../../components/modals/users/edit";
