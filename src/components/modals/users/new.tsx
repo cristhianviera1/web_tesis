@@ -16,7 +16,6 @@ const NewUsersModal: FunctionComponent<NewUsersModalValues> = ({visible, initial
     const [users, setUsers] = useState<UsersTable>()
 
     const saveUser = (data: UsersValues) => {
-        console.log(data);
         setLoading(true);
         axiosConfig().post('users', data)
             .then(() => {

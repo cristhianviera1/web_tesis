@@ -207,7 +207,7 @@ class Users extends Component {
                 dataIndex: 'image',
                 key: 'image',
                 render: (image) => (
-                    <Avatar size={44} icon={<UserOutlined />} src={image}/>
+                    <Avatar size={44} icon={<UserOutlined/>} src={image}/>
                 )
             },
             {
@@ -229,8 +229,8 @@ class Users extends Component {
                 render: (value) => {
                     const foundGender = colorPeerGender.find((genders) => genders.gender === value);
                     return (
-                        <Tag color={foundGender.color}>
-                            {foundGender.label}
+                        <Tag color={foundGender?.color || 'lime'}>
+                            {foundGender?.label}
                         </Tag>
                     );
                 },

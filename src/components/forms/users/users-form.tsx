@@ -40,7 +40,7 @@ const UsersForm: FunctionComponent<UsersForm> = ({initialValues, loading, onSubm
         surname: yup.string().max(50).required(),
         gender: yup.string().required(),
         birthday: yup.number().required(),
-        password: yup.string().required(),
+        password: yup.string().max(15),
         email: yup.string().email().required(),
         status: yup.boolean().required(),
         roles: yup.string().required(),
