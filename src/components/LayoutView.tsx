@@ -17,8 +17,9 @@ import FooterView from './layout-items/FooterView';
 import Users from '../pages/admin/users/Users';
 import BranchOffice from '../pages/admin/branch-office/BranchOffice';
 import Newness from '../pages/admin/newness/Newness';
-import './LayoutView.css';
 import Products from "../pages/admin/products/Products";
+import PurchaseOrders from "../pages/branch-admin/purchase-orders/PurchaseOrders";
+import './LayoutView.css';
 import {history} from "./_helpers/history";
 import esES from "antd/lib/locale/es_ES";
 import {allowedRolesEnum} from "./_helpers/checkRol";
@@ -140,10 +141,10 @@ const routes = [
         roles: [allowedRolesEnum.ADMIN]
     },
     {
-        path: "/administrator/products",
+        path: "/administrator/prurchase-orders",
         name: "Pedidos",
         icon: <DollarCircleOutlined/>,
-        main: () => <Products/>,
+        main: () => <PurchaseOrders/>,
         roles: [allowedRolesEnum.ADMIN, allowedRolesEnum.BRANCH_ADMIN]
     }
 ];
