@@ -1,6 +1,5 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
-import {BranchOfficeTable} from "../../../pages/admin/branch-office/BranchOffice";
 import BranchOfficeForm, {BranchOfficeValues} from "../../forms/branch_offices/branch-office-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
@@ -13,36 +12,10 @@ interface EditBranchModalValues {
 
 const EditBranchModal: FunctionComponent<EditBranchModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [branchOffice, setBranchOffice] = useState<BranchOfficeTable>()
-    const office = {
-        _id: "",
-        name: "",
-        email: "",
-        address: {
-            first_address: "",
-            second_address: "",
-            country: "",
-            state: "",
-            city: "",
-            latitude: "",
-            longitude: "",
-        }
-    }
 
-    const saveBranch = (data) => {
-        office._id= data.id
-        office.name=data.name
-        office.email=data.email
-        office.address.first_address=data.first_address
-        office.address.second_address=data.second_address
-        office.address.country=data.country
-        office.address.state=data.state
-        office.address.city=data.city
-        office.address.latitude=data.latitude
-        office.address.longitude=data.longitude
-        console.log(office);
+    const saveBranch = (data: BranchOfficeValues) => {
         setLoading(true);
-        axiosConfig().put('branch-offices', office)
+        axiosConfig().put('branch-offices', {...data, _id: data.id})
             .then(() => message.success("Se ha editado exitósamente la sucursal"))
             .catch((error) => {
                 if (error?.response?.data?.messsage) {

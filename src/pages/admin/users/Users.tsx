@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import {Avatar, Button, Col, Input, message, Modal, Row, Space, Table, Tag, Typography} from 'antd';
+import {Avatar, Button, Col, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
 import {
     DeleteOutlined,
     EditOutlined,
     ExclamationCircleOutlined,
+    ManOutlined,
     PlusOutlined,
     SearchOutlined,
-    UserOutlined
+    UserOutlined,
+    WomanOutlined
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import NewUsersModal from "../../../components/modals/users/new";
 import EditUserModal from "../../../components/modals/users/edit";
-import {PresetColorType, PresetStatusColorType} from "antd/lib/_util/colors";
 
 const {Title, Text} = Typography;
 
@@ -34,24 +35,24 @@ export interface UsersTable {
 interface colors {
     gender: string;
     label: string;
-    color: PresetColorType | PresetStatusColorType
+    icon: any
 }
 
 export const colorPeerGender: colors[] = [
     {
         gender: "man",
         label: "Hombre",
-        color: "blue"
+        icon: <ManOutlined/>
     },
     {
         gender: "woman",
         label: "Mujer",
-        color: "pink"
+        icon: <WomanOutlined/>
     },
     {
         gender: "other",
         label: "Otro",
-        color: "lime"
+        icon: <UserOutlined/>
     },
 ]
 
@@ -229,9 +230,13 @@ class Users extends Component {
                 render: (value) => {
                     const foundGender = colorPeerGender.find((genders) => genders.gender === value);
                     return (
-                        <Tag color={foundGender?.color || 'lime'}>
-                            {foundGender?.label}
-                        </Tag>
+                        <Space style={{justifyContent: 'space-evenly'}}>
+                            {foundGender.icon}
+                            <Text>
+                                {foundGender?.label}
+                            </Text>
+                        </Space>
+
                     );
                 },
             },
@@ -245,9 +250,17 @@ class Users extends Component {
                 title: 'Estado',
                 dataIndex: 'status',
                 key: 'status',
-                render: (key, record) => <Tag color={key ? "success" : "error"}>
-                    {key ? "Activo" : "Inactivo"}
-                </Tag>,
+                render: (key) =>
+                    <Space style={{justifyContent: 'space-evenly'}}>
+                        <div style={{
+                            height: '10px', width: '10px', backgroundColor: key ? '#1F8110' : '#8C0406',
+                            borderRadius: '50%',
+                            display: 'inline-block'
+                        }}/>
+                        <Text>
+                            {key ? "Activo" : "Inactivo"}
+                        </Text>
+                    </Space>
             },
             {
                 title: 'Acciones',

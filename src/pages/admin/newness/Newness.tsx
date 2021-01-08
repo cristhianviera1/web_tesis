@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Col, Image, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
+import {Button, Col, DatePicker, Image, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, PlusOutlined, SearchOutlined} from '@ant-design/icons';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
@@ -7,6 +7,8 @@ import NewNewnessModal from "../../../components/modals/newness/new";
 import EditNewnessModal from "../../../components/modals/newness/edit";
 import Highlighter from "react-highlight-words";
 import moment from "moment";
+
+const {RangePicker} = DatePicker;
 
 const {Title} = Typography;
 
@@ -29,11 +31,15 @@ class Newness extends Component {
         visibleEditModal: false,
         visibleNewModal: false,
         idNews: 0,
+        startDate: 0,
+        endDate: 0
     };
 
     getNewness() {
         this.setState({loading: true});
-        axiosConfig().get('newness')
+        const {startDate, endDate} = this.state;
+        const uriText = startDate > 0 && endDate > 0 ? `newness?start_date=${startDate}&end_date=${endDate}` : 'newness'
+        axiosConfig().get(uriText)
             .then(({data}) => {
                 this.setState({
                     newness: data?.map((order, index) => ({
@@ -47,10 +53,6 @@ class Newness extends Component {
                 });
             })
             .catch((error) => {
-                if (error?.response?.data?.message) {
-                    return message.error(error?.response?.data?.message);
-                }
-                return message.error("No se pudieron obtener las novedades, por favor recargue la página")
             }).finally(() => this.setState({loading: false}));
     }
 
@@ -209,32 +211,52 @@ class Newness extends Component {
         ];
         return <div>
             <div>
-                <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
-                    <Col className="gutter-row" span={20}>
+                <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}} style={{justifyContent: 'space-between'}}>
+                    <Col>
                         <Title level={2}>Novedades</Title>
-                    </Col>
-                    <Col className="gutter-row" span={4}>
-                        <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
-                            this.setState({visibleNewModal: true})
-                        }}>
-                            Nuevo
-                        </Button>
-                        {
-                            this.state.visibleNewModal &&
-                            <NewNewnessModal
-                                visible={this.state.visibleNewModal}
-                                initialValues={{
-                                    title: "",
-                                    description: "",
-                                    image: "",
-                                }}
-                                onClose={() => {
-                                    this.getNewness();
-                                    this.setState({visibleNewModal: false})
+                        <Space size='large'>
+                            <RangePicker
+                                disabledDate={(current) => current && current > moment().endOf("day")}
+                                onCalendarChange={(currentMoment, value) => {
+                                    this.setState({startDate: moment(value[0]).unix()});
+                                    this.setState({endDate: moment(value[1]).endOf("day").unix()});
                                 }}
                             />
-                        }
+                            {
+                                <Button
+                                    ghost={true}
+                                    type={"primary"}
+                                    style={{marginLeft: "2%"}}
+                                    icon={<SearchOutlined/>}
+                                    onClick={() => {
+                                        this.getNewness();
+                                    }}
+                                >
+                                    Buscar
+                                </Button>
+                            }
+                        </Space>
                     </Col>
+                    <Button type="primary" icon={<PlusOutlined/>} onClick={() => {
+                        this.setState({visibleNewModal: true})
+                    }}>
+                        Nuevo
+                    </Button>
+                    {
+                        this.state.visibleNewModal &&
+                        <NewNewnessModal
+                            visible={this.state.visibleNewModal}
+                            initialValues={{
+                                title: "",
+                                description: "",
+                                image: "",
+                            }}
+                            onClose={() => {
+                                this.getNewness();
+                                this.setState({visibleNewModal: false})
+                            }}
+                        />
+                    }
                 </Row>
             </div>
             <Table
