@@ -27,7 +27,7 @@ const EditPurchaseOrderModal: FunctionComponent<EditPurchaseOrderModalValues> = 
     }
 
     const savePurchaseOrder = (data) => {
-        order._id = data.id
+        order._id = data._id
         order.status.status = data.status
         order.voucher.statuses.status = data.voucher_status
         console.log(order);

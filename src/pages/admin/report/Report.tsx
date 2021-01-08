@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
 import {Button, Col, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
-import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, SearchOutlined} from '@ant-design/icons';
+import {FileExcelOutlined, SearchOutlined} from '@ant-design/icons';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
-import EditPurchaseOrderModal from "../../../components/modals/purchase_orders/edit";
 import Highlighter from "react-highlight-words";
 import moment from "moment";
+import ExportJsonExcel from 'js-export-excel';
 
 const {Title, Text} = Typography;
 
-export interface PurchaseOrdersTable {
+export interface OrdersReportTable {
     _id: string;
     key: number;
     name: string;
@@ -22,7 +22,7 @@ export interface PurchaseOrdersTable {
     created_at: string;
 }
 
-class PurchaseOrders extends Component {
+class OrdersReport extends Component {
 
     state = {
         purchaseOrders: [],
@@ -61,27 +61,43 @@ class PurchaseOrders extends Component {
             }).finally(() => this.setState({loading: false}));
     }
 
-    confirmDeleteModal(purchaseOrder) {
-        return Modal.confirm({
-            title: "Eliminar Orden de Compra",
-            icon: <ExclamationCircleOutlined/>,
-            content: `¿Estás seguro que deseas eliminar la orden de compra de: ${purchaseOrder.name + ' ' + purchaseOrder.surname}?`,
-            okText: "Aceptar",
-            okType: "danger",
-            onOk: () => this.deletePurchaseOrder(purchaseOrder),
-            visible: true,
-            cancelText: "Cancelar"
-        });
-    };
+    downloadExcel() {
+        const data = this.state.purchaseOrders ? this.state.purchaseOrders : '';
+        let options = {
+            fileName : '',
+            datas : []
+        };
 
-    deletePurchaseOrder(purchaseOrder) {
-        axiosConfig().delete(`shopping-carts/${purchaseOrder._id}`).then(() => message.success("Se ha eliminado exitósamente la orden de compra"))
-            .catch((error) => {
-                if (error?.response?.data?.message) {
-                    return message.error(error?.response?.data?.message);
+        let dataTable = [];
+
+        if(data) {
+            for(let i in data) {
+                if(data) {
+                    let obj = {
+                        'Nº': data[i].key,
+                        'Nombre': data[i].name,
+                        'Apellido': data[i].surname,
+                        'Status': data[i].status,
+                        'Productos': data[i].products,
+                        'Voucher': data[i].voucher_status,
+                        'Total': data[i].total,
+                        'Creacion': data[i].created_at
+                    }
+                    dataTable.push(obj);
                 }
-                return message.error("No se pudo eliminar la orden de compra, por favor intentelo mas tarde")
-            }).finally(() => this.getPurchaseOrders())
+            }
+        }
+
+        options.fileName = 'Reporte Kimirina';
+        options.datas = [{
+            sheetData: dataTable,
+            sheetName: 'sheet',
+            sheetFilter: ['Nº','Nombre','Apellido','Status','Productos','Voucher','Total','Creacion'],
+            sheetHeader: ['Nº','Nombre','Apellido','Status','Productos','Voucher','Total','Creacion'],
+        }]
+
+        let toExcel = new ExportJsonExcel(options);
+        toExcel.saveExcel();
     }
 
     componentDidMount() {
@@ -157,7 +173,7 @@ class PurchaseOrders extends Component {
     };
 
     render() {
-        const columns: ColumnsType<PurchaseOrdersTable> = [
+        const columns: ColumnsType<OrdersReportTable> = [
             {
                 title: 'ID',
                 dataIndex: 'key',
@@ -193,27 +209,20 @@ class PurchaseOrders extends Component {
                 key: 'voucher_status',
                 ...this.getColumnSearchProps('voucher_status')
             },
-            {
-                title: 'Acciones',
-                dataIndex: 'key',
-                key: 'actions',
-                render: (key, record) => (
-                    <Space size="middle">
-                        <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-                            this.setState({visibleEditModal: true, idNews: key - 1});
-                        }}/>
-                        <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
-                            this.setState({idNews: key - 1});
-                            this.confirmDeleteModal(record)
-                        }}/>
-                    </Space>)
-            },
         ];
+
         return <div>
             <div>
                 <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
-                    <Col className="gutter-row" span={24}>
-                        <Title level={2}>Ordenes de compra</Title>
+                    <Col className="gutter-row" span={20}>
+                        <Title level={2}>Reporte de ordenes de compra</Title>
+                    </Col>
+                    <Col className="gutter-row" span={4}>
+                        <Button type="primary" style={{backgroundColor:"green"}} icon={<FileExcelOutlined />} onClick={() => {
+                            this.downloadExcel();}
+                        }>
+                            Exportar a excel
+                        </Button>
                     </Col>
                 </Row>
             </div>
@@ -223,19 +232,8 @@ class PurchaseOrders extends Component {
                 scroll={{x: 'max-content'}}
                 loading={this.state.loading}
             />
-            {
-                this.state.visibleEditModal &&
-                <EditPurchaseOrderModal
-                    visible={this.state.visibleEditModal}
-                    initialValues={this.state.purchaseOrders[this.state.idPurchaseOrder]}
-                    onClose={() => {
-                        this.getPurchaseOrders();
-                        this.setState({visibleEditModal: false})
-                    }}
-                />
-            }
         </div>
     }
 }
 
-export default PurchaseOrders;
+export default OrdersReport;

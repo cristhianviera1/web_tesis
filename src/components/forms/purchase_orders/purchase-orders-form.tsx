@@ -8,7 +8,7 @@ const {Text} = Typography
 const {Option} = Select;
 
 export interface PurchaseOrdersValues {
-    _id?: string;
+    _id: string;
     name: string;
     surname: string;
     products: [];
@@ -43,10 +43,15 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
     })
     useEffect(() => {
         reset(initialValues);
-        //dataProduct();
+        dataProduct(initialValues.products);
     }, [initialValues])
 
     const columns = [
+        {
+            title: 'Nº',
+            dataIndex: 'key',
+            key: 'key',
+        },
         {
             title: 'Producto',
             dataIndex: 'product',
@@ -64,15 +69,20 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
         },
     ]
 
-    const data = []
+    const footerTable = 'El total a pagar es: ' + initialValues.total
 
-    function dataProduct() {
-        data: this.initialValues?.products.map((order, index) => ({
-            "key": index + 1,
-            "product": order?.product?.name,
-            "quantity": order?.quantity,
-            "price": order?.product?.price,
-        }))
+    const dataTable = []
+
+    function dataProduct(products) {
+        for(let i = 0; i<products.length; i++){
+            dataTable.push({
+                "key": i + 1,
+                "product": products[i].product.name,
+                "quantity": products[i].quantity,
+                "price": products[i].product.price
+            })
+        }
+        console.log(dataTable)
     }
 
 
@@ -87,7 +97,7 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
             </Form.Item>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 <Col span={12}>
-                    <Form.Item label={"* Nombre"}>
+                    <Form.Item label={"Nombre"}>
                         <Controller
                             name={'name'}
                             as={Input}
@@ -97,7 +107,7 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
                     </Form.Item>
                 </Col>
                 <Col span={12}>
-                    <Form.Item label={"* Apellido"}>
+                    <Form.Item label={"Apellido"}>
                         <Controller
                             name={'surname'}
                             as={Input}
@@ -107,12 +117,12 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
                     </Form.Item>
                 </Col>
             </Row>
-            <Form.Item label={"* Pedido"}>
+            <Form.Item label={"Pedido"}>
                 <Controller
                     name={'products'}
                     control={control}
                     render={() => (
-                        <Table columns={columns} dataSource={data}>
+                        <Table columns={columns} dataSource={dataTable} footer={() => footerTable}>
                         </Table>
                     )}
                 />

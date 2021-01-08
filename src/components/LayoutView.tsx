@@ -6,7 +6,8 @@ import {
     IdcardOutlined,
     LogoutOutlined,
     NotificationOutlined,
-    ShopOutlined
+    ShopOutlined,
+    FileTextOutlined
 } from '@ant-design/icons';
 import {BrowserRouter as Router, Link, Switch} from "react-router-dom";
 import {PrivateRoute} from './_helpers/PrivateRoute';
@@ -19,6 +20,7 @@ import BranchOffice from '../pages/admin/branch-office/BranchOffice';
 import Newness from '../pages/admin/newness/Newness';
 import Products from "../pages/admin/products/Products";
 import PurchaseOrders from "../pages/branch-admin/purchase-orders/PurchaseOrders";
+import Report from "../pages/admin/report/Report";
 import './LayoutView.css';
 import {history} from "./_helpers/history";
 import esES from "antd/lib/locale/es_ES";
@@ -146,6 +148,13 @@ const routes = [
         icon: <DollarCircleOutlined/>,
         main: () => <PurchaseOrders/>,
         roles: [allowedRolesEnum.ADMIN, allowedRolesEnum.BRANCH_ADMIN]
+    },
+    {
+        path: "/administrator/reports",
+        name: "Reporte",
+        icon: <FileTextOutlined />,
+        main: () => <Report/>,
+        roles: [allowedRolesEnum.ADMIN]
     }
 ];
 

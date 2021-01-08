@@ -6,6 +6,7 @@ import {axiosConfig} from '../../../components/_helpers/axiosConfig';
 import NewNewnessModal from "../../../components/modals/newness/new";
 import EditNewnessModal from "../../../components/modals/newness/edit";
 import Highlighter from "react-highlight-words";
+import moment from "moment";
 
 const {Title} = Typography;
 
@@ -15,6 +16,7 @@ export interface NewnessTable {
     title: string;
     description: string;
     image: string;
+    create_date: string;
 }
 
 class Newness extends Component {
@@ -40,6 +42,7 @@ class Newness extends Component {
                         "title": order?.title,
                         "description": order?.description,
                         "image": order?.image,
+                        "create_date": moment.unix(order?.created_at).format('DD/MM/YYYY'),
                     }))
                 });
             })
@@ -158,6 +161,15 @@ class Newness extends Component {
                 dataIndex: 'title',
                 key: 'title',
                 ...this.getColumnSearchProps('title')
+            },
+            {
+                title: 'Fecha',
+                dataIndex: 'create_date',
+                key: 'create_date',
+                filterMultiple: false,
+                onFilter: (value: any, record) => record.create_date.indexOf(value) === 0,
+                sorter: (a, b) => a.create_date.length - b.create_date.length,
+                sortDirections: ['descend', 'ascend'],
             },
             {
                 title: 'Descripción',
