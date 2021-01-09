@@ -1,7 +1,6 @@
 import React, {FunctionComponent, useState} from "react";
 import {message, Modal} from "antd";
-import {BranchOfficeTable} from "../../../pages/admin/branch-office/BranchOffice";
-import PurchaseOrderForm , {PurchaseOrdersValues} from "../../forms/purchase_orders/purchase-orders-form";
+import PurchaseOrderForm, {PurchaseOrdersValues} from "../../forms/purchase_orders/purchase-orders-form";
 import {axiosConfig} from "../../_helpers/axiosConfig";
 
 interface EditPurchaseOrderModalValues {
@@ -13,27 +12,14 @@ interface EditPurchaseOrderModalValues {
 
 const EditPurchaseOrderModal: FunctionComponent<EditPurchaseOrderModalValues> = ({visible, initialValues, onClose}) => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [purchaseOrder, setPurchaseOrder] = useState<BranchOfficeTable>()
-    const order = {
-        _id: "",
-        status: {
-            status: ""
-        },
-        voucher: {
-            statuses: {
-                status: ""
-            }
-        }
-    }
-
     const savePurchaseOrder = (data) => {
-        order._id = data._id
-        order.status.status = data.status
-        order.voucher.statuses.status = data.voucher_status
-        console.log(order);
+        const form = {
+            delivery_status: initialValues.voucher_status !== 'aprobado' ? undefined : data.status,
+            status: data.voucher_status,
+        };
         setLoading(true);
-        axiosConfig().put('shopping-carts', order)
-            .then(() => message.success("Se ha gestionado exitósamente la orden de compra"))
+        axiosConfig().put(`shopping-carts/status/${data._id}`, form)
+            .then(({data}) => message.success("Se ha gestionado exitósamente la orden de compra"))
             .catch((error) => {
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)

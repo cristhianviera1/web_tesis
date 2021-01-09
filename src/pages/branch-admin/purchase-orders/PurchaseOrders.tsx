@@ -6,6 +6,7 @@ import {axiosConfig} from '../../../components/_helpers/axiosConfig';
 import EditPurchaseOrderModal from "../../../components/modals/purchase_orders/edit";
 import Highlighter from "react-highlight-words";
 import moment from "moment";
+import {ProductsTable} from "../../../components/forms/purchase_orders/purchase-orders-form";
 
 const {Title, Text} = Typography;
 
@@ -14,7 +15,7 @@ export interface PurchaseOrdersTable {
     key: number;
     name: string;
     surname: string;
-    products: [];
+    products: ProductsTable[];
     status: string;
     voucher_status: string;
     voucher_image: string;
@@ -44,7 +45,13 @@ class PurchaseOrders extends Component {
                         "_id": order?._id,
                         "name": order?.user?.name,
                         "surname": order?.user?.surname,
-                        "products": order?.products,
+                        "products": order?.products.map((product) => ({
+                            id: product.product._id,
+                            name: product.product.name,
+                            price: product.product.price,
+                            quantity: product.quantity,
+                            image: product.product.image,
+                        })),
                         "status": order?.status[order?.status.length - 1].status,
                         "voucher_status": order?.voucher?.statuses[order?.voucher?.statuses.length - 1].status,
                         "voucher_image": order?.voucher?.statuses?.image,

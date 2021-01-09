@@ -1,5 +1,5 @@
-import React, {FunctionComponent, useEffect, useState} from "react";
-import {Button, Col, Form, Input, Row, Select, Space, Table, Typography} from "antd";
+import React, {FunctionComponent, useEffect} from "react";
+import {Button, Col, Form, Image, Input, Row, Select, Space, Table, Typography} from "antd";
 import * as yup from 'yup';
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
@@ -7,11 +7,19 @@ import {yupResolver} from "@hookform/resolvers";
 const {Text} = Typography
 const {Option} = Select;
 
+export interface ProductsTable {
+    id: string;
+    name: string;
+    quantity: string;
+    price: string;
+    image: string;
+}
+
 export interface PurchaseOrdersValues {
     _id: string;
     name: string;
     surname: string;
-    products: [];
+    products: ProductsTable[];
     status: string;
     voucher_status: string;
     voucher_image: string;
@@ -43,7 +51,6 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
     })
     useEffect(() => {
         reset(initialValues);
-        dataProduct(initialValues.products);
     }, [initialValues])
 
     const columns = [
@@ -51,6 +58,16 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
             title: 'Nº',
             dataIndex: 'key',
             key: 'key',
+        },
+        {
+            title: 'Imagen',
+            dataIndex: 'image',
+            key: 'image',
+            render: (text) => (
+                <div style={{borderRadius: '50%'}}>
+                    <Image src={text} alt={"Imagen del producto"} width={100} height={100}/>
+                </div>
+            )
         },
         {
             title: 'Producto',
@@ -71,20 +88,13 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
 
     const footerTable = 'El total a pagar es: ' + initialValues.total
 
-    const dataTable = []
-
-    function dataProduct(products) {
-        for(let i = 0; i<products.length; i++){
-            dataTable.push({
-                "key": i + 1,
-                "product": products[i].product.name,
-                "quantity": products[i].quantity,
-                "price": products[i].product.price
-            })
-        }
-        console.log(dataTable)
-    }
-
+    const dataTable = initialValues.products.map((product, key) => ({
+        "key": key + 1,
+        "product": product.name,
+        "quantity": product.quantity,
+        "price": product.price,
+        "image": product.image
+    }))
 
     return (
         <Form layout={'vertical'} onFinish={handleSubmit(onSubmit)}>
@@ -118,14 +128,7 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
                 </Col>
             </Row>
             <Form.Item label={"Pedido"}>
-                <Controller
-                    name={'products'}
-                    control={control}
-                    render={() => (
-                        <Table columns={columns} dataSource={dataTable} footer={() => footerTable}>
-                        </Table>
-                    )}
-                />
+                <Table columns={columns} dataSource={dataTable} footer={() => footerTable}/>
             </Form.Item>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 <Col span={12}>
