@@ -15,7 +15,9 @@ export interface OrdersReportTable {
     name: string;
     surname: string;
     products: [];
-    status: string;
+    status: [];
+    voucher: [];
+    last_status: string;
     voucher_status: string;
     voucher_image: string;
     total: string;
@@ -45,8 +47,10 @@ class OrdersReport extends Component {
                         "name": order?.user?.name,
                         "surname": order?.user?.surname,
                         "products": order?.products,
-                        "status": order?.status[0].status,
-                        "voucher_status": order?.voucher?.statuses[0].status,
+                        "status": order?.status,
+                        "voucher": order?.voucher,
+                        "last_status": order?.status[order?.status.length - 1].status,
+                        "voucher_status": order?.voucher?.statuses[order?.voucher?.statuses.length - 1].status,
                         "voucher_image": order?.voucher?.statuses?.image,
                         "total": order?.total,
                         "created_at": moment.unix(order?.created_at).format('DD/MM/YYYY'),
@@ -72,18 +76,31 @@ class OrdersReport extends Component {
 
         if(data) {
             for(let i in data) {
-                if(data) {
-                    let obj = {
-                        'Nº': data[i].key,
-                        'Nombre': data[i].name,
-                        'Apellido': data[i].surname,
-                        'Status': data[i].status,
-                        'Productos': data[i].products,
-                        'Voucher': data[i].voucher_status,
-                        'Total': data[i].total,
-                        'Creacion': data[i].created_at
+                let dataProducts = data[i].products;
+                let dataStatus = data[i].status;
+                let dataVoucher = data[i].voucher.statuses;
+
+                for(let j in dataProducts) {
+                    for(let k in dataStatus) {
+                        for(let l in dataVoucher) {
+                            if(data) {
+                                let obj = {
+                                    'Nº': data[i].key,
+                                    'Nombre': data[i].name,
+                                    'Apellido': data[i].surname,
+                                    'Estatus_Contacto': dataStatus[k].status,
+                                    'Fecha_Estatus_Contacto': moment.unix(dataStatus[k].timestamp).format('DD/MM/YYYY'),
+                                    'Estatus_Voucher': dataVoucher[l].status,
+                                    'Fecha_Estatus_Voucher': moment.unix(dataVoucher[l].created_at).format('DD/MM/YYYY'),
+                                    'Producto': dataProducts[j].product.name,
+                                    'Cantidad': dataProducts[j].quantity,
+                                    'Total': data[i].total,
+                                    'Creacion': data[i].created_at
+                                }
+                                dataTable.push(obj);
+                            }
+                        }
                     }
-                    dataTable.push(obj);
                 }
             }
         }
@@ -92,8 +109,8 @@ class OrdersReport extends Component {
         options.datas = [{
             sheetData: dataTable,
             sheetName: 'sheet',
-            sheetFilter: ['Nº','Nombre','Apellido','Status','Productos','Voucher','Total','Creacion'],
-            sheetHeader: ['Nº','Nombre','Apellido','Status','Productos','Voucher','Total','Creacion'],
+            sheetFilter: ['Nº','Nombre','Apellido','Estatus_Contacto','Fecha_Estatus_Contacto','Producto','Cantidad','Estatus_Voucher','Fecha_Estatus_Voucher','Total','Creacion'],
+            sheetHeader: ['Nº','Nombre','Apellido','Estatus_Contacto','Fecha_Estatus_Contacto','Producto','Cantidad','Estatus_Voucher','Fecha_Estatus_Voucher','Total','Creacion'],
         }]
 
         let toExcel = new ExportJsonExcel(options);
@@ -199,7 +216,7 @@ class OrdersReport extends Component {
             },
             {
                 title: 'Contacto',
-                dataIndex: 'status',
+                dataIndex: 'last_status',
                 key: 'status',
                 ...this.getColumnSearchProps('status')
             },
