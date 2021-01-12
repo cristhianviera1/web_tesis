@@ -207,10 +207,10 @@ class PurchaseOrders extends Component {
                 render: (key, record) => (
                     <Space size="middle">
                         <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-                            this.setState({visibleEditModal: true, idNews: key - 1});
+                            this.setState({visibleEditModal: true, idPurchaseOrder: key - 1});
                         }}/>
                         <Button shape="circle" danger icon={<DeleteOutlined/>} onClick={() => {
-                            this.setState({idNews: key - 1});
+                            this.setState({idPurchaseOrder: key - 1});
                             this.confirmDeleteModal(record)
                         }}/>
                     </Space>)
