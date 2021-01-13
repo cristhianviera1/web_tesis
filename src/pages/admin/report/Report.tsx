@@ -80,32 +80,41 @@ class OrdersReport extends Component {
                 let dataStatus = data[i].status;
                 let dataVoucher = data[i].voucher.statuses;
 
+                let objOrder = {
+                    'Nº': data[i].key,
+                    'Nombre': data[i].name,
+                    'Apellido': data[i].surname,
+                    'Total': data[i].total,
+                    'Creacion': data[i].created_at
+                }
+                dataTable.push(objOrder);
+
                 for(let j in dataProducts) {
-                    for(let k in dataStatus) {
-                        for(let l in dataVoucher) {
-                            if(data) {
-                                let obj = {
-                                    'Nº': data[i].key,
-                                    'Nombre': data[i].name,
-                                    'Apellido': data[i].surname,
-                                    'Estatus_Contacto': dataStatus[k].status,
-                                    'Fecha_Estatus_Contacto': moment.unix(dataStatus[k].timestamp).format('DD/MM/YYYY'),
-                                    'Estatus_Voucher': dataVoucher[l].status,
-                                    'Fecha_Estatus_Voucher': moment.unix(dataVoucher[l].created_at).format('DD/MM/YYYY'),
-                                    'Producto': dataProducts[j].product.name,
-                                    'Cantidad': dataProducts[j].quantity,
-                                    'Total': data[i].total,
-                                    'Creacion': data[i].created_at
-                                }
-                                dataTable.push(obj);
-                            }
-                        }
+                    let objProd = {
+                        'Producto': dataProducts[j].product.name,
+                        'Cantidad': dataProducts[j].quantity,
                     }
+                    dataTable.push(objProd);
+                }
+                for(let k in dataStatus) {
+                    let objStatus = {
+                        'Estatus_Contacto': dataStatus[k].status,
+                        'Fecha_Estatus_Contacto': moment.unix(dataStatus[k].timestamp).format('DD/MM/YYYY'),
+                    }
+                    dataTable.push(objStatus);
+                }
+                for(let l in dataVoucher) {
+                    let objVoucher = {
+                        'Estatus_Voucher': dataVoucher[l].status,
+                        'Fecha_Estatus_Voucher': moment.unix(dataVoucher[l].created_at).format('DD/MM/YYYY'),
+                    }
+                    dataTable.push(objVoucher);
                 }
             }
         }
 
-        options.fileName = 'Reporte Kimirina';
+        const date = new Date();
+        options.fileName = 'Reporte Kimirina - ' + date;
         options.datas = [{
             sheetData: dataTable,
             sheetName: 'sheet',
