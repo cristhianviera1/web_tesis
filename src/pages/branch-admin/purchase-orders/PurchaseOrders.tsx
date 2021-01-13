@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Col, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
+import {Button, Col, Image, Input, message, Modal, Row, Space, Table, Typography} from 'antd';
 import {ColumnsType} from 'antd/lib/table';
 import {DeleteOutlined, EditOutlined, ExclamationCircleOutlined, SearchOutlined} from '@ant-design/icons';
 import {axiosConfig} from '../../../components/_helpers/axiosConfig';
@@ -54,7 +54,7 @@ class PurchaseOrders extends Component {
                         })),
                         "status": order?.status[order?.status.length - 1].status,
                         "voucher_status": order?.voucher?.statuses[order?.voucher?.statuses.length - 1].status,
-                        "voucher_image": order?.voucher?.statuses?.image,
+                        "voucher_image": order?.voucher?.image,
                         "total": order?.total,
                         "created_at": moment.unix(order?.created_at).format('DD/MM/YYYY'),
                     }))
@@ -175,6 +175,24 @@ class PurchaseOrders extends Component {
                 dataIndex: 'name',
                 key: 'name',
                 render: (value, record) => (<Text>{`${record.name} ${record.surname}`}</Text>),
+            },
+            {
+                title: 'Comprobante',
+                dataIndex: 'voucher_image',
+                key: 'voucher_image',
+                render: (value) => {
+                    if (value) {
+                        return <div style={{
+                            borderRadius: '50%',
+                            overflow: 'hidden',
+                            height: 100,
+                            width: 100,
+                        }}>
+                            <Image src={value} alt={"Imagen del producto"} width={100} height={100}/>
+                        </div>
+                    }
+                    return <Text type={'warning'}>Pendiente comprobante</Text>
+                }
             },
             {
                 title: 'Fecha Ingreso',

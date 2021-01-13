@@ -130,6 +130,13 @@ const PurchaseOrderForm: FunctionComponent<PurchaseOrderForm> = ({initialValues,
             <Form.Item label={"Pedido"}>
                 <Table columns={columns} dataSource={dataTable} footer={() => footerTable}/>
             </Form.Item>
+            <Form.Item label={'Comprobante'} style={{width: '100%'}}>
+                <Image src={initialValues.voucher_image} alt={'voucher image'} width={100} height={100} style={{
+                    display: 'block',
+                    marginLeft: 'auto',
+                    marginRight: 'auto'
+                }}/>
+            </Form.Item>
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 <Col span={12}>
                     <Form.Item label={"* Contacto"}>
