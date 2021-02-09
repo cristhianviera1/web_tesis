@@ -11,9 +11,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@dev
       - name: Install dependencies
-        uses: npm install
+        run: npm install
       - name: Build
-        uses: npm run build
+        run: npm run build
       - name: Archive production
         uses: actions/upload-artifact@master
         with:
