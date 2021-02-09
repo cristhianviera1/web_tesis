@@ -166,7 +166,7 @@ class BranchOffice extends Component {
                 title: 'Nombre',
                 dataIndex: 'name',
                 key: 'name',
-                width: '30%',
+                width: '150px',
                 ...this.getColumnSearchProps('name')
             },
             {

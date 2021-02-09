@@ -5,6 +5,7 @@ import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
 import {CheckOutlined, CloseOutlined, PlusCircleOutlined} from "@ant-design/icons";
 import moment from "moment";
+import { allowedRolesEnum } from "../../_helpers/checkRol";
 
 const {Text} = Typography
 const {Option} = Select;
@@ -40,7 +41,11 @@ const UsersForm: FunctionComponent<UsersForm> = ({initialValues, loading, onSubm
         surname: yup.string().max(50).required(),
         gender: yup.string().required(),
         birthday: yup.number().required(),
-        password: yup.string().max(15),
+        password: yup.string().max(15)
+        .min(8,'Debe contener mínimo 8 caracteres')
+        .matches(/[a-z]/,  'Debe contener minúsculas (a-z)')
+        .matches(/[A-Z]/,  'Debe contener mayúsculas (A-Z)')
+        .matches(/\d+/,  'Debe contener mínimo un numero (0-9)'),
         email: yup.string().email().required(),
         status: yup.boolean().required(),
         roles: yup.string().required(),
@@ -142,6 +147,7 @@ const UsersForm: FunctionComponent<UsersForm> = ({initialValues, loading, onSubm
                             name={'password'}
                             as={Input.Password}
                             control={control}
+                            disabled={initialValues.roles === 'client'}
                         />
                         {
                             errors.password && <Text type={'danger'}>{errors.password.message}</Text>
@@ -198,7 +204,6 @@ const UsersForm: FunctionComponent<UsersForm> = ({initialValues, loading, onSubm
                             control={control}
                         >
                             <Option value="admin">Administrador</Option>
-                            <Option value="branch_admin">Sucursal</Option>
                             <Option value="brigadista">Brigadista</Option>
                             <Option value="client">Usuario</Option>
                         </Controller>

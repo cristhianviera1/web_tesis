@@ -209,6 +209,7 @@ class Products extends Component {
                 ],
                 filterMultiple: false,
                 onFilter: (value, record) => record.status.indexOf(value) === 0,
+                render:(text)=> text ? "Activo" : "Inactivo"
             },
             {
                 title: 'Acciones',

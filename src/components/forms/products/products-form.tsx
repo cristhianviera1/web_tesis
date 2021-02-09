@@ -3,7 +3,7 @@ import {Button, Col, Form, Input, InputNumber, message, Row, Space, Switch, Typo
 import * as yup from 'yup';
 import {Controller, useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers";
-import {PlusCircleOutlined} from "@ant-design/icons";
+import {CheckOutlined, CloseOutlined, PlusCircleOutlined} from "@ant-design/icons";
 
 const {Text} = Typography
 const {TextArea} = Input;
@@ -130,11 +130,18 @@ const ProductsForm: FunctionComponent<ProductsForm> = ({initialValues, loading, 
             <Row gutter={{xs: 8, sm: 16, md: 24, lg: 32}}>
                 <Col span={8}>
                     <Form.Item label={"* Estado"}>
-                        <Controller
+                    <Controller
                             name={'status'}
-                            as={Switch}
                             control={control}
-                            defaultChecked
+                            render={({value, onChange}) => (
+                                <Switch
+                                    checked={value}
+                                    checkedChildren={<CheckOutlined/>}
+                                    unCheckedChildren={<CloseOutlined/>}
+                                    defaultChecked
+                                    onChange={(val) => onChange(val)}
+                                />
+                            )}
                         />
                         {
                             errors.status && <Text type={'danger'}>{errors.status.message}</Text>

@@ -31,6 +31,7 @@ const NewBranchModal: FunctionComponent<NewBranchModalValues> = ({visible, initi
         axiosConfig().post('branch-offices', data)
             .then(() => message.success("Se ha creado exitósamente la sucursal"))
             .catch((error) => {
+                console.log(error.response);
                 if (error?.response?.data?.messsage) {
                     return message.error(error?.response?.data?.messsage)
                 }
